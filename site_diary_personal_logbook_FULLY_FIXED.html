@@ -1,0 +1,2954 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>Site Diary & QCS Inspection Log</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;600&display=swap" rel="stylesheet">
+  <style>
+    body {
+      font-family: 'Inter', sans-serif;
+      background-color: #f1f5f9;
+      color: #0f172a;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .font-mono-code {
+      font-family: 'JetBrains Mono', monospace;
+    }
+    /* Hide scrollbar for clean horizontal pills */
+    .no-scrollbar::-webkit-scrollbar {
+      display: none;
+    }
+    .no-scrollbar {
+      -ms-overflow-style: none;
+      scrollbar-width: none;
+    }
+    @page { size: A4 portrait; margin: 12mm 12mm 14mm 12mm; }
+    #a4-print-report { display: none; }
+    @media print {
+      html, body { width: 210mm !important; min-height: 297mm !important; margin: 0 !important; padding: 0 !important; background: #fff !important; color: #000 !important; -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
+      body { font-family: Arial, sans-serif !important; }
+      .no-print, header, #toast, #camera-modal, #defect-modal, #item-modal, #new-day-modal, #backup-modal, #photo-viewer-modal, #reset-modal, #prev-entries-modal, .fixed.bottom-4, main { display: none !important; }
+      #export-modal { display: block !important; position: static !important; inset: auto !important; padding: 0 !important; margin: 0 !important; background: #fff !important; }
+      #export-modal > div { width: 100% !important; max-width: none !important; margin: 0 !important; padding: 0 !important; border: 0 !important; border-radius: 0 !important; box-shadow: none !important; }
+      #export-modal > div > div:first-child, #export-modal > div > div:last-child, #export-preview-text { display: none !important; }
+      #a4-print-report { display: block !important; width: 100% !important; font-size: 9.5pt !important; line-height: 1.35 !important; }
+      .print-header { display: flex !important; justify-content: space-between !important; align-items: flex-end !important; border-bottom: 2px solid #0f172a !important; margin-bottom: 5mm !important; padding-bottom: 2.5mm !important; }
+      .print-title { font-size: 16pt !important; font-weight: 800 !important; }
+      .print-meta { font-size: 8.5pt !important; color: #334155 !important; }
+      .print-session { margin: 4mm 0 2mm !important; font-size: 11pt !important; font-weight: 800 !important; border-bottom: 1px solid #cbd5e1 !important; padding-bottom: 1mm !important; }
+      .print-item { break-inside: avoid !important; page-break-inside: avoid !important; border: 1px solid #cbd5e1 !important; border-radius: 2mm !important; padding: 2.5mm !important; margin-bottom: 2.5mm !important; }
+      .print-item-title { font-weight: 700 !important; }
+      .print-small { font-size: 8.5pt !important; color: #334155 !important; margin-top: 1mm !important; }
+      .print-defect { color: #991b1b !important; }
+      .print-general { break-inside: avoid !important; margin-top: 4mm !important; border-top: 1px solid #94a3b8 !important; padding-top: 2mm !important; }
+      .print-photo-grid { display: grid !important; grid-template-columns: repeat(2, 1fr) !important; gap: 3mm !important; margin-top: 2mm !important; }
+      .print-photo { width: 100% !important; max-height: 75mm !important; object-fit: contain !important; border: 1px solid #cbd5e1 !important; break-inside: avoid !important; }
+    }
+
+    @media print {
+      #a4-print-report { font-family: "Times New Roman", Times, serif !important; font-size: 10pt !important; line-height: 1.25 !important; }
+      .logbook-heading { text-align: center; font-size: 16pt; font-weight: 700; text-decoration: underline; margin: 0 0 5mm; }
+      .logbook-front { width: 100%; border-collapse: collapse; margin-bottom: 5mm; }
+      .logbook-front td { border: 1px solid #000; padding: 2.2mm 2.5mm; vertical-align: top; }
+      .logbook-front .label { width: 26mm; font-weight: 700; white-space: nowrap; }
+      .signature-space { height: 10mm; }
+      .daily-title { font-size: 12pt; font-weight: 700; text-decoration: underline; margin: 3mm 0 2mm; }
+      .daily-info { width: 100%; border-collapse: collapse; margin-bottom: 3mm; }
+      .daily-info th, .daily-info td { border: 1px solid #000; padding: 2mm; text-align: left; }
+      .daily-info th { width: 24mm; background: #eee !important; font-weight: 700; }
+      .logbook-table { width: 100%; border-collapse: collapse; table-layout: fixed; }
+      .logbook-table th, .logbook-table td { border: 1px solid #000; padding: 2mm; vertical-align: top; overflow-wrap: anywhere; }
+      .logbook-table th { text-align: center; font-weight: 700; background: #e7e6e6 !important; }
+      .logbook-table tr { break-inside: avoid; page-break-inside: avoid; }
+      .col-no { width: 7mm; text-align: center; }
+      .col-time { width: 20mm; text-align: center; }
+      .col-activity { width: 54mm; }
+      .col-participants { width: 34mm; }
+      .col-result { width: auto; }
+      .entry-type { font-size: 8.5pt; font-weight: 700; }
+      .entry-details { margin-top: 1mm; }
+      .nonconformity { margin-top: 1.5mm; font-weight: 700; }
+      .photo-section { break-before: page; page-break-before: always; }
+      .photo-title { font-size: 12pt; font-weight: 700; text-decoration: underline; margin-bottom: 3mm; }
+      .logbook-photo-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 4mm; }
+      .logbook-photo-card { break-inside: avoid; page-break-inside: avoid; border: 1px solid #000; padding: 2mm; }
+      .logbook-photo { display: block; width: 100%; max-height: 92mm; object-fit: contain; }
+      .photo-caption { font-size: 8.5pt; margin-top: 1.5mm; }
+      .meeting-note { margin-top: 4mm; border: 1px solid #000; padding: 2.5mm; break-inside: avoid; page-break-inside: avoid; }
+      .footer-note { margin-top: 3mm; font-size: 8pt; }
+    }
+
+    /* A4 full-page print override */
+    @page { size: A4 portrait; margin: 10mm; }
+    @media print {
+      html, body {
+        width: auto !important;
+        min-width: 0 !important;
+        max-width: none !important;
+        min-height: 0 !important;
+      }
+      #export-modal {
+        width: auto !important;
+        max-width: none !important;
+      }
+      #export-modal > div,
+      #a4-print-report {
+        width: 100% !important;
+        max-width: none !important;
+        min-width: 0 !important;
+        box-sizing: border-box !important;
+      }
+      #a4-print-report {
+        zoom: 1 !important;
+        transform: none !important;
+        font-size: 10pt !important;
+      }
+      .logbook-front,
+      .daily-info,
+      .logbook-table {
+        width: 100% !important;
+        max-width: 100% !important;
+      }
+    }
+  </style>
+</head>
+<body class="pb-28">
+
+  <!-- Toast Notification Banner -->
+  <div id="toast" class="fixed top-4 left-1/2 -translate-x-1/2 z-50 hidden items-center gap-2 bg-slate-900 text-white px-4 py-3 rounded-xl shadow-xl border border-slate-700 text-sm font-medium transition-all duration-200 max-w-[92vw]">
+    <span id="toast-icon" class="text-amber-400">✔</span>
+    <span id="toast-msg">Saved</span>
+  </div>
+
+  <!-- Top App Bar -->
+  <header class="bg-slate-900 text-white sticky top-0 z-30 shadow-md border-b border-slate-800 no-print">
+    <div class="max-w-3xl mx-auto px-4 py-3 flex items-center justify-between gap-2">
+      <div class="flex items-center gap-2.5">
+        <div class="w-10 h-10 rounded-xl bg-amber-500 text-slate-950 flex items-center justify-center font-extrabold text-lg shadow-inner">
+          QCS
+        </div>
+        <div>
+          <h1 class="text-base sm:text-lg font-bold tracking-tight leading-tight">Site Inspection Diary</h1>
+          <p class="text-xs text-slate-400 flex items-center gap-1.5">
+            <span class="inline-block w-2 h-2 rounded-full bg-emerald-400"></span>
+            <span id="storage-status-label">Phone Storage Active</span>
+          </p>
+        </div>
+      </div>
+
+      <div class="flex items-center gap-2">
+        <button onclick="openBackupModal()" class="bg-slate-800 hover:bg-slate-700 active:scale-95 text-slate-200 font-semibold text-xs px-3 py-2.5 rounded-xl border border-slate-700 transition flex items-center gap-1.5" title="Choose save folder or backup/restore">
+          <svg class="w-4 h-4 text-emerald-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z" />
+          </svg>
+          <span class="hidden sm:inline">Save Folder / Backup</span>
+        </button>
+
+        <button onclick="openExportModal()" class="bg-amber-500 hover:bg-amber-400 active:scale-95 text-slate-950 font-bold text-xs sm:text-sm px-3.5 py-2.5 rounded-xl shadow transition flex items-center gap-1.5">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+          </svg>
+          <span>Export Diary</span>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Content Container -->
+  <main class="max-w-3xl mx-auto px-3 sm:px-4 pt-4 space-y-4">
+
+    <!-- Multi-Day Diary Switcher Bar (Saved on Phone Storage) -->
+    <section class="bg-white rounded-2xl shadow-sm border border-slate-200 p-3 space-y-2.5 no-print">
+      <div class="flex items-center justify-between gap-2">
+        <span class="text-[11px] font-extrabold uppercase tracking-wider text-slate-500 flex items-center gap-1.5">
+          <svg class="w-4 h-4 text-sky-600" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+          </svg>
+          Saved Site Diary Logs (<span id="saved-days-count">1</span> days on device)
+        </span>
+        <div class="flex items-center gap-1.5">
+          <button id="today-button" onclick="createNewDayDiary('today')" class="text-xs font-bold bg-sky-50 hover:bg-sky-100 text-sky-800 border border-sky-200 px-2.5 py-1.5 rounded-xl transition">
+            + Today
+          </button>
+          <button onclick="openNewDayModal()" class="text-xs font-bold bg-slate-900 hover:bg-slate-800 text-white px-2.5 py-1.5 rounded-xl transition">
+            + New Date
+          </button>
+        </div>
+      </div>
+
+      <!-- Horizontal Scrollable Saved Date Pills -->
+      <div id="saved-days-pills" class="flex items-center gap-2 overflow-x-auto no-scrollbar pb-0.5"></div>
+    </section>
+
+    <!-- Diary Header Metadata Card -->
+    <section class="bg-white rounded-2xl shadow-sm border border-slate-200 p-4 space-y-3">
+      <div class="flex items-center justify-between">
+        <span class="text-xs font-bold uppercase tracking-wider text-slate-500 flex items-center gap-1.5">
+          <svg class="w-4 h-4 text-amber-500" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+          </svg>
+          Inspector & Site Conditions
+        </span>
+        <div class="flex items-center gap-3 no-print">
+          <button onclick="syncWeatherForCurrentDate(true)" class="text-xs text-sky-600 hover:text-sky-700 font-semibold flex items-center gap-1">
+            <span>🔄 Auto HK Weather</span>
+          </button>
+          <button onclick="openResetConfirm()" class="text-xs text-slate-400 hover:text-rose-600 underline font-medium">
+            Reset Day
+          </button>
+        </div>
+      </div>
+
+      <div class="grid grid-cols-2 sm:grid-cols-4 gap-2.5">
+        <div class="col-span-2 sm:col-span-1">
+          <label class="block text-[11px] font-semibold text-slate-500 uppercase mb-1">Inspector</label>
+          <input id="meta-inspector" type="text" onchange="updateMeta('inspector', this.value)"
+            class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-sm font-semibold text-slate-900 focus:outline-none focus:ring-2 focus:ring-amber-500" />
+        </div>
+        <div>
+          <label class="block text-[11px] font-semibold text-slate-500 uppercase mb-1">Role / Title</label>
+          <input id="meta-role" type="text" onchange="updateMeta('role', this.value)"
+            class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-sm font-semibold text-slate-900 focus:outline-none focus:ring-2 focus:ring-amber-500" />
+        </div>
+        <div>
+          <label class="block text-[11px] font-semibold text-slate-500 uppercase mb-1">Date (DD/MM/YYYY)</label>
+          <input id="meta-date" type="text" onchange="handleDateChange(this.value)"
+            class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-sm font-semibold text-slate-900 focus:outline-none focus:ring-2 focus:ring-amber-500" />
+        </div>
+        <div class="col-span-2 sm:col-span-1">
+          <label class="block text-[11px] font-semibold text-slate-500 uppercase mb-1">Weather (HK Auto) & Temp</label>
+          <div class="flex gap-1.5">
+            <select id="meta-weather" onchange="updateMeta('weather', this.value)"
+              class="w-3/5 bg-slate-50 border border-slate-200 rounded-xl px-2 py-2 text-xs sm:text-sm font-semibold text-slate-900 focus:outline-none focus:ring-2 focus:ring-amber-500">
+              <option value="Mainly cloudy with sunny periods">⛅ Mainly cloudy / sunny periods</option>
+              <option value="Sunny and dry">☀️ Sunny and dry</option>
+              <option value="Sunny">☀️ Sunny</option>
+              <option value="Fine and dry">🌤️ Fine and dry</option>
+              <option value="Cloudy">☁️ Cloudy</option>
+              <option value="Cloudy with a few rain patches">🌦️ Cloudy / rain patches</option>
+              <option value="Rainy">🌧️ Rainy</option>
+              <option value="Humid">💧 Humid</option>
+            </select>
+            <input id="meta-temp" type="text" onchange="updateMeta('temp', this.value)"
+              class="w-2/5 bg-slate-50 border border-slate-200 rounded-xl px-1.5 py-2 text-xs sm:text-sm font-semibold text-center text-slate-900 focus:outline-none focus:ring-2 focus:ring-amber-500" />
+          </div>
+        </div>
+      </div>
+
+      <!-- Summary Metrics Strip -->
+      <div class="grid grid-cols-4 gap-2 pt-2 border-t border-slate-100 text-center">
+        <div class="bg-slate-50 rounded-xl p-2">
+          <div id="stat-total" class="text-lg font-extrabold text-slate-900">11</div>
+          <div class="text-[11px] font-medium text-slate-500">Inspections</div>
+        </div>
+        <div class="bg-emerald-50 rounded-xl p-2">
+          <div id="stat-attendance" class="text-lg font-extrabold text-emerald-700">11/11</div>
+          <div class="text-[11px] font-medium text-emerald-700">AE & Foreman</div>
+        </div>
+        <div class="bg-amber-50 rounded-xl p-2">
+          <div id="stat-defects" class="text-lg font-extrabold text-amber-700">0</div>
+          <div class="text-[11px] font-medium text-amber-700">Defect Msgs</div>
+        </div>
+        <div class="bg-sky-50 rounded-xl p-2">
+          <div id="stat-photos" class="text-lg font-extrabold text-sky-700">0</div>
+          <div class="text-[11px] font-medium text-sky-700">Site Photos</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Quick Field Action Toolbar -->
+    <section class="flex flex-wrap items-center justify-between gap-2 bg-slate-800 text-white p-3 rounded-2xl shadow-sm no-print">
+      <div class="flex flex-wrap items-center gap-2">
+        <button onclick="openAddInspectionModal('Afternoon')" class="bg-emerald-500 hover:bg-emerald-400 active:scale-95 text-slate-950 font-extrabold text-xs sm:text-sm px-3.5 py-2.5 rounded-xl flex items-center gap-1.5 shadow">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4" />
+          </svg>
+          <span>+ New Entry</span>
+        </button>
+
+        <button onclick="openPreviousEntriesModal()" class="bg-sky-500 hover:bg-sky-400 active:scale-95 text-slate-950 font-extrabold text-xs sm:text-sm px-3.5 py-2.5 rounded-xl flex items-center gap-1.5 shadow">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.3" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M8 7v8a2 2 0 002 2h6M8 7V5a2 2 0 012-2h4.586a1 1 0 01.707.293l4.414 4.414a1 1 0 01.293.707V15a2 2 0 01-2 2h-2M8 7H6a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2v-2" />
+          </svg>
+          <span>Select Previous Entries</span>
+        </button>
+
+        <button onclick="openCameraModal(null)" class="bg-amber-500 hover:bg-amber-400 active:scale-95 text-slate-950 font-bold text-xs sm:text-sm px-3.5 py-2.5 rounded-xl flex items-center gap-2 shadow">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.3" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" />
+            <path stroke-linecap="round" stroke-linejoin="round" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z" />
+          </svg>
+          <span>Quick Camera</span>
+        </button>
+
+        <button onclick="openQuickDefectModal()" class="bg-rose-600 hover:bg-rose-500 active:scale-95 text-white font-semibold text-xs sm:text-sm px-3.5 py-2.5 rounded-xl flex items-center gap-1.5 shadow">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+          </svg>
+          <span>+ Paste Defect Msg</span>
+        </button>
+      </div>
+
+      <button onclick="markAllAttendance()" class="text-xs bg-slate-700 hover:bg-slate-600 text-emerald-300 font-semibold px-3 py-2 rounded-xl border border-slate-600 transition">
+        ✔ All AE & Foreman Present
+      </button>
+    </section>
+
+    <!-- Rapid 2-Second Field Quick-Add Bar -->
+    <section class="bg-white rounded-2xl shadow-sm border-2 border-amber-400/70 p-3.5 space-y-2.5 no-print">
+      <div class="flex flex-wrap items-center justify-between gap-2">
+        <span class="text-xs font-extrabold uppercase tracking-wider text-slate-700 flex items-center gap-1.5">
+          <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+          On-The-Fly Quick Entry
+        </span>
+        <div class="flex flex-wrap items-center gap-1.5">
+          <select id="quick-session" class="bg-slate-100 border border-slate-200 rounded-lg px-2 py-1 text-xs font-bold text-slate-800 focus:outline-none focus:ring-2 focus:ring-amber-500">
+            <option value="Morning">AM</option>
+            <option value="Afternoon" selected>PM</option>
+          </select>
+          <select id="quick-type" onchange="syncStatusOptionsForType('quick')" class="bg-indigo-50 border border-indigo-200 rounded-lg px-2 py-1 text-xs font-extrabold text-indigo-900 focus:outline-none focus:ring-2 focus:ring-amber-500">
+            <option value="Inspection" selected>📋 Inspection</option>
+            <option value="Random Check">🎲 Random Check</option>
+          </select>
+          <select id="quick-category" class="bg-sky-50 border border-sky-200 rounded-lg px-2 py-1 text-xs font-extrabold text-sky-900 focus:outline-none focus:ring-2 focus:ring-amber-500">
+            <option value="Rebar Fixing">🔩 Rebar Fixing</option>
+            <option value="MOS">📑 MOS</option>
+            <option value="NDT">📡 NDT</option>
+            <option value="Concreting">🏗️ Concreting</option>
+            <option value="Formwork">🪵 Formwork</option>
+            <option value="Steelwork">⚙️ Steelwork</option>
+            <option value="Cube Test">🧪 Cube Test</option>
+            <option value="General">📌 General</option>
+          </select>
+          <select id="quick-status" class="bg-slate-100 border border-slate-200 rounded-lg px-2 py-1 text-xs font-bold text-slate-800 focus:outline-none focus:ring-2 focus:ring-amber-500">
+            <option value="Accepted with comments">✔ Accepted with comments</option>
+            <option value="Accepted with minor defects">⚠️ Accepted with minor defects</option>
+            <option value="Reinspection required">🔄 Reinspection required</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- 1-Tap Common QCS Task Chips -->
+      <div class="flex items-center gap-1.5 overflow-x-auto no-scrollbar pb-0.5">
+        <button type="button" onclick="applyQuickChip('MOS review ', 'Inspection', 'MOS')" class="shrink-0 text-[11px] font-semibold bg-sky-50 hover:bg-sky-100 text-sky-800 px-2.5 py-1 rounded-lg border border-sky-200 transition">
+          + MOS
+        </button>
+        <button type="button" onclick="applyQuickChip('Rebar fixing inspection ', 'Inspection', 'Rebar Fixing')" class="shrink-0 text-[11px] font-semibold bg-sky-50 hover:bg-sky-100 text-sky-800 px-2.5 py-1 rounded-lg border border-sky-200 transition">
+          + Rebar fixing
+        </button>
+        <button type="button" onclick="applyQuickChip('NDT inspection ', 'Inspection', 'NDT')" class="shrink-0 text-[11px] font-semibold bg-sky-50 hover:bg-sky-100 text-sky-800 px-2.5 py-1 rounded-lg border border-sky-200 transition">
+          + NDT
+        </button>
+        <button type="button" onclick="applyQuickChip('Random check concreting', 'Random Check', 'Concreting')" class="shrink-0 text-[11px] font-semibold bg-indigo-50 hover:bg-indigo-100 text-indigo-800 px-2.5 py-1 rounded-lg border border-indigo-200 transition">
+          + Random check concreting
+        </button>
+        <button type="button" onclick="applyQuickChip('Random check slump', 'Random Check', 'Concreting')" class="shrink-0 text-[11px] font-semibold bg-indigo-50 hover:bg-indigo-100 text-indigo-800 px-2.5 py-1 rounded-lg border border-indigo-200 transition">
+          + Random check slump
+        </button>
+        <button type="button" onclick="applyQuickChip('Formwork check ', 'Inspection', 'Formwork')" class="shrink-0 text-[11px] font-semibold bg-slate-100 hover:bg-amber-100 hover:text-amber-900 text-slate-700 px-2.5 py-1 rounded-lg border border-slate-200 transition">
+          + Formwork check
+        </button>
+        <button type="button" onclick="applyQuickChip('Cube test ', 'Inspection', 'Cube Test')" class="shrink-0 text-[11px] font-semibold bg-slate-100 hover:bg-amber-100 hover:text-amber-900 text-slate-700 px-2.5 py-1 rounded-lg border border-slate-200 transition">
+          + Cube test
+        </button>
+        <button type="button" onclick="applyQuickChip('Reinspected ', 'Inspection', 'General')" class="shrink-0 text-[11px] font-semibold bg-slate-100 hover:bg-amber-100 hover:text-amber-900 text-slate-700 px-2.5 py-1 rounded-lg border border-slate-200 transition">
+          + Reinspection
+        </button>
+      </div>
+
+      <!-- Input + Instant Add / Add & Snap Buttons -->
+      <div class="flex flex-col sm:flex-row gap-2">
+        <input id="quick-title-input" type="text" onkeydown="if(event.key==='Enter') handleQuickAdd(false)"
+          placeholder="Type location / activity (e.g., BST205 B3 wall rebar)..."
+          class="flex-1 bg-slate-50 border border-slate-300 rounded-xl px-3.5 py-2.5 text-sm font-semibold text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-amber-500" />
+        <div class="flex items-center gap-2 shrink-0">
+          <button type="button" onclick="handleQuickAdd(false)"
+            class="flex-1 sm:flex-initial bg-slate-900 hover:bg-slate-800 active:scale-95 text-white font-bold text-xs sm:text-sm px-4 py-2.5 rounded-xl shadow transition">
+            + Add Entry
+          </button>
+          <button type="button" onclick="handleQuickAdd(true)"
+            class="flex-1 sm:flex-initial bg-amber-500 hover:bg-amber-400 active:scale-95 text-slate-950 font-extrabold text-xs sm:text-sm px-3.5 py-2.5 rounded-xl shadow flex items-center justify-center gap-1.5 transition"
+            title="Create entry and immediately open camera">
+            <span>📷 Add & Snap</span>
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <!-- Filter / Search Bar -->
+    <div class="flex items-center gap-2 no-print">
+      <div class="relative flex-1">
+        <input id="search-input" type="text" oninput="renderInspections()" placeholder="Filter inspection items, codes (e.g. BST209, C149), or defects..."
+          class="w-full bg-white border border-slate-200 rounded-xl pl-9 pr-3 py-2.5 text-sm text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-amber-500 shadow-sm" />
+        <svg class="w-4 h-4 text-slate-400 absolute left-3 top-3" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+        </svg>
+      </div>
+      <select id="filter-status" onchange="renderInspections()" class="bg-white border border-slate-200 rounded-xl px-3 py-2.5 text-xs sm:text-sm font-semibold text-slate-700 focus:outline-none focus:ring-2 focus:ring-amber-500 shadow-sm">
+        <option value="all">All Items</option>
+        <option value="type-Inspection">Mode: Inspection</option>
+        <option value="type-Random Check">Mode: Random Check</option>
+        <option value="cat-MOS">Type: MOS</option>
+        <option value="cat-Rebar Fixing">Type: Rebar Fixing</option>
+        <option value="cat-NDT">Type: NDT</option>
+        <option value="cat-Concreting">Type: Concreting</option>
+        <option value="cat-Formwork">Type: Formwork</option>
+        <option value="cat-Steelwork">Type: Steelwork</option>
+        <option value="cat-Cube Test">Type: Cube Test</option>
+        <option value="Accepted with comments">Accepted w/ comments</option>
+        <option value="Accepted with minor defects">Accepted w/ minor defects</option>
+        <option value="Reinspection required">Reinspection required</option>
+        <option value="OK">Random Check: OK</option>
+        <option value="Not OK and rectified">Random Check: Not OK & rectified</option>
+        <option value="defects">With Defect Msgs</option>
+        <option value="photos">With Photos</option>
+      </select>
+    </div>
+
+    <!-- MORNING SESSION -->
+    <section class="space-y-3">
+      <div class="flex items-center justify-between px-1">
+        <div class="flex items-center gap-2">
+          <span class="px-2.5 py-1 rounded-lg bg-amber-100 text-amber-800 text-xs font-extrabold uppercase tracking-wider">Morning</span>
+          <h2 class="text-sm font-bold text-slate-700">AM Inspection Log</h2>
+        </div>
+        <button onclick="openAddInspectionModal('Morning')" class="text-xs font-bold text-slate-700 hover:text-amber-600 bg-white border border-slate-200 px-3 py-1.5 rounded-xl shadow-sm active:scale-95 transition no-print">
+          + Add Morning Item
+        </button>
+      </div>
+      <div id="morning-list" class="space-y-3"></div>
+    </section>
+
+    <!-- AFTERNOON SESSION -->
+    <section class="space-y-3 pt-2">
+      <div class="flex items-center justify-between px-1">
+        <div class="flex items-center gap-2">
+          <span class="px-2.5 py-1 rounded-lg bg-sky-100 text-sky-800 text-xs font-extrabold uppercase tracking-wider">Afternoon</span>
+          <h2 class="text-sm font-bold text-slate-700">PM Inspection Log</h2>
+        </div>
+        <button onclick="openAddInspectionModal('Afternoon')" class="text-xs font-bold text-slate-700 hover:text-amber-600 bg-white border border-slate-200 px-3 py-1.5 rounded-xl shadow-sm active:scale-95 transition no-print">
+          + Add Afternoon Item
+        </button>
+      </div>
+      <div id="afternoon-list" class="space-y-3"></div>
+    </section>
+
+    <!-- General / Unassigned Defect Messages Section -->
+    <section class="bg-white rounded-2xl shadow-sm border border-slate-200 p-4 space-y-3">
+      <div class="flex items-center justify-between">
+        <div>
+          <h3 class="text-sm font-bold text-slate-900 flex items-center gap-1.5">
+            <span class="w-2.5 h-2.5 rounded-full bg-rose-500"></span>
+            General Site Remarks & Unlinked Defect Messages
+          </h3>
+          <p class="text-xs text-slate-500">Supplement overall site notes or additional contractor WhatsApp/SMS messages</p>
+        </div>
+      </div>
+      <textarea id="general-notes" rows="3" onchange="updateMeta('generalNotes', this.value)"
+        placeholder="Paste general contractor messages, overall site progress notes, or weather impacts here..."
+        class="w-full bg-slate-50 border border-slate-200 rounded-xl p-3 text-sm text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-amber-500"></textarea>
+    </section>
+
+  </main>
+
+  <!-- Floating Bottom Quick-Add & Camera Buttons (Mobile Ergonomics) -->
+  <div class="fixed bottom-4 right-4 z-30 flex items-center gap-2.5 no-print">
+    <button onclick="openAddInspectionModal('Afternoon')" aria-label="Add New Inspection Entry"
+      class="h-14 px-4 rounded-full bg-slate-900 hover:bg-slate-800 active:scale-95 text-white shadow-2xl border-2 border-slate-700 flex items-center gap-1.5 font-extrabold text-xs transition">
+      <svg class="w-5 h-5 text-emerald-400" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4" />
+      </svg>
+      <span>Add Entry</span>
+    </button>
+
+    <button onclick="openCameraModal(null)" aria-label="Open Site Camera"
+      class="w-16 h-16 rounded-full bg-amber-500 hover:bg-amber-400 active:scale-95 text-slate-950 shadow-2xl border-4 border-white flex flex-col items-center justify-center transition">
+      <svg class="w-7 h-7" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" />
+        <path stroke-linecap="round" stroke-linejoin="round" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z" />
+      </svg>
+      <span class="text-[9px] font-extrabold uppercase tracking-tight leading-none mt-0.5">Snap</span>
+    </button>
+  </div>
+
+  <!-- ===================================================================== -->
+  <!-- MODAL 1: INBUILT LIVE CAMERA & MULTI-PHOTO WATERMARKING               -->
+  <!-- ===================================================================== -->
+  <div id="camera-modal" class="fixed inset-0 z-50 bg-slate-950/95 hidden flex-col justify-between p-3 sm:p-5">
+    <!-- Camera Header -->
+    <div class="flex items-center justify-between text-white max-w-2xl mx-auto w-full">
+      <div>
+        <h3 class="font-bold text-base flex items-center gap-2">
+          <span class="w-2.5 h-2.5 rounded-full bg-rose-500 animate-pulse"></span>
+          Site Inspection Camera (Multi-Photo Batch)
+        </h3>
+        <p id="camera-subtitle" class="text-xs text-slate-400">Snap multiple photos or pick multiple from gallery in one go</p>
+      </div>
+      <button onclick="closeCameraModal()" class="p-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200">
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+        </svg>
+      </button>
+    </div>
+
+    <!-- Camera Target Inspection Selector -->
+    <div class="max-w-2xl mx-auto w-full my-2 space-y-2">
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
+        <div>
+          <label class="block text-[11px] font-semibold text-slate-400 uppercase mb-1">Assign to Inspection Item</label>
+          <select id="camera-inspection-select" class="w-full bg-slate-800 border border-slate-700 text-white rounded-xl px-3 py-2 text-sm font-medium focus:outline-none focus:ring-2 focus:ring-amber-500">
+          </select>
+        </div>
+        <div>
+          <label class="block text-[11px] font-semibold text-slate-400 uppercase mb-1">Photo Caption / Defect Tag (Applied to Batch)</label>
+          <input id="camera-caption-input" type="text" placeholder="e.g., Rebar spacing checked, Slump 175mm..."
+            class="w-full bg-slate-800 border border-slate-700 text-white rounded-xl px-3 py-2 text-sm placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-amber-500" />
+        </div>
+      </div>
+    </div>
+
+    <!-- Live Video / Captured Preview Viewport -->
+    <div class="relative flex-1 max-w-2xl mx-auto w-full bg-slate-900 rounded-2xl overflow-hidden border border-slate-800 flex items-center justify-center my-1">
+      <video id="camera-video" autoplay playsinline muted class="w-full h-full object-cover"></video>
+      <canvas id="camera-canvas" class="hidden w-full h-full object-contain"></canvas>
+
+      <!-- Live Overlay Watermark Preview -->
+      <div id="camera-live-overlay" class="absolute bottom-3 left-3 right-3 bg-slate-950/75 backdrop-blur-sm text-white px-3 py-2 rounded-xl border border-white/10 text-xs font-mono-code pointer-events-none">
+        <div class="text-amber-400 font-bold" id="overlay-inspector">Chan Wing Yiu (QCS) | 17/11/2026</div>
+        <div class="text-slate-200 truncate" id="overlay-item-label">Inspection Item</div>
+      </div>
+
+      <!-- Fallback Message if Webcam Blocked / Unavailable -->
+      <div id="camera-fallback-box" class="hidden absolute inset-0 bg-slate-900/95 flex flex-col items-center justify-center p-6 text-center space-y-4">
+        <div class="w-14 h-14 rounded-2xl bg-amber-500/20 text-amber-400 flex items-center justify-center">
+          <svg class="w-8 h-8" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" />
+          </svg>
+        </div>
+        <div>
+          <h4 class="text-white font-bold text-base">Select Multiple Photos or Open Device Camera</h4>
+          <p class="text-slate-400 text-xs mt-1 max-w-sm">Choose one or multiple site photos from your phone—all selected photos are automatically stamped with your QCS watermark.</p>
+        </div>
+        <label class="cursor-pointer bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold text-sm px-5 py-3 rounded-xl shadow-lg inline-flex items-center gap-2">
+          <span>📷 Select Multiple Photos / Camera</span>
+          <input id="camera-file-fallback" type="file" accept="image/*" multiple onchange="handleFallbackFiles(event)" class="hidden" />
+        </label>
+      </div>
+    </div>
+
+    <!-- Batch Photo Queue Strip (Shows multiple queued photos ready to attach in one go) -->
+    <div id="batch-queue-bar" class="hidden max-w-2xl mx-auto w-full bg-slate-900/90 border border-slate-700 rounded-xl p-2 mt-2">
+      <div class="flex items-center justify-between text-[11px] text-slate-300 mb-1.5 px-1">
+        <span class="font-bold text-amber-400">Queued Photos (<span id="batch-queue-count">0</span>) — Tap ✕ to remove</span>
+        <button type="button" onclick="clearBatchQueue()" class="text-slate-400 hover:text-rose-400 underline">Clear All</button>
+      </div>
+      <div id="batch-queue-thumbs" class="flex items-center gap-2 overflow-x-auto no-scrollbar pb-0.5"></div>
+    </div>
+
+    <!-- Camera Bottom Controls -->
+    <div class="max-w-2xl mx-auto w-full pt-2 flex items-center justify-between gap-2">
+      <!-- Multi-Select Upload / Native Camera Button Always Accessible -->
+      <label class="cursor-pointer bg-slate-800 hover:bg-slate-700 text-slate-200 font-semibold text-xs px-3 py-3 rounded-xl border border-slate-700 flex items-center gap-1.5 shrink-0">
+        <svg class="w-4 h-4 text-amber-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+        </svg>
+        <span>+ Multi-Select</span>
+        <input type="file" accept="image/*" multiple onchange="handleFallbackFiles(event)" class="hidden" />
+      </label>
+
+      <!-- Live Shutter + Attach Batch Controls -->
+      <div id="live-shutter-group" class="flex items-center gap-2.5">
+        <button onclick="capturePhotoToQueue()" class="w-14 h-14 sm:w-16 sm:h-16 rounded-full bg-white hover:bg-amber-100 active:scale-90 border-4 border-amber-500 shadow-xl flex items-center justify-center transition" title="Snap Photo into Queue">
+          <div class="w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-amber-500"></div>
+        </button>
+
+        <button id="attach-queue-btn" onclick="commitBatchPhotos()" class="hidden bg-emerald-500 hover:bg-emerald-400 active:scale-95 text-slate-950 font-extrabold text-xs sm:text-sm px-4 py-3 rounded-xl shadow-lg transition">
+          ✔ Attach All (<span id="attach-queue-btn-count">0</span>)
+        </button>
+      </div>
+
+      <!-- Switch Front/Rear Camera -->
+      <button onclick="switchCameraFacing()" class="bg-slate-800 hover:bg-slate-700 text-slate-200 font-semibold text-xs px-3 py-3 rounded-xl border border-slate-700 flex items-center gap-1.5 shrink-0">
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+        </svg>
+        <span>Flip</span>
+      </button>
+    </div>
+  </div>
+
+  <!-- ===================================================================== -->
+  <!-- MODAL 2: QUICK PASTE / ADD DEFECT MESSAGE TO CONTRACTOR               -->
+  <!-- ===================================================================== -->
+  <div id="defect-modal" class="fixed inset-0 z-50 bg-slate-950/70 backdrop-blur-xs hidden items-end sm:items-center justify-center p-0 sm:p-4">
+    <div class="bg-white w-full max-w-lg rounded-t-3xl sm:rounded-2xl shadow-2xl p-5 space-y-4">
+      <div class="flex items-center justify-between border-b border-slate-100 pb-3">
+        <div>
+          <h3 class="text-base font-extrabold text-slate-900">Log Contractor Defect Message</h3>
+          <p class="text-xs text-slate-500">Paste WhatsApp/SMS defect notices sent to the contractor</p>
+        </div>
+        <button onclick="closeDefectModal()" class="p-2 rounded-xl bg-slate-100 text-slate-600 hover:bg-slate-200">✕</button>
+      </div>
+
+      <div class="space-y-3">
+        <div>
+          <label class="block text-xs font-bold text-slate-600 uppercase mb-1">Related Inspection Item</label>
+          <select id="defect-inspection-select" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2.5 text-sm font-semibold text-slate-900 focus:outline-none focus:ring-2 focus:ring-amber-500"></select>
+        </div>
+
+        <div>
+          <label class="block text-xs font-bold text-slate-600 uppercase mb-1">Defect Message Sent to Contractor</label>
+          <textarea id="defect-text-input" rows="4" placeholder="Paste or type defect message sent to contractor AE / Foreman (e.g., 'C149 Column Head: honeycombing observed at north face, please hack & patch with approved non-shrink grout before next pour')..."
+            class="w-full bg-slate-50 border border-slate-200 rounded-xl p-3 text-sm text-slate-900 focus:outline-none focus:ring-2 focus:ring-rose-500"></textarea>
+        </div>
+
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="block text-xs font-bold text-slate-600 uppercase mb-1">Recipient / Channel</label>
+            <input id="defect-recipient-input" type="text" value="Contractor AE & Foreman (WhatsApp)"
+              class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-sm text-slate-900 focus:outline-none focus:ring-2 focus:ring-amber-500" />
+          </div>
+          <div>
+            <label class="block text-xs font-bold text-slate-600 uppercase mb-1">Status</label>
+            <select id="defect-status-select" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-sm font-semibold text-slate-900 focus:outline-none focus:ring-2 focus:ring-amber-500">
+              <option value="Sent to Contractor">Sent to Contractor</option>
+              <option value="Rectification Pending">Rectification Pending</option>
+              <option value="Re-inspected & Closed">Re-inspected & Closed</option>
+            </select>
+          </div>
+        </div>
+      </div>
+
+      <div class="flex items-center justify-end gap-2 pt-2">
+        <button onclick="closeDefectModal()" class="px-4 py-2.5 rounded-xl text-sm font-semibold text-slate-600 hover:bg-slate-100">Cancel</button>
+        <button onclick="saveDefectMessage()" class="px-5 py-2.5 rounded-xl text-sm font-bold bg-rose-600 hover:bg-rose-500 text-white shadow">
+          Save Defect Message
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===================================================================== -->
+  <!-- MODAL 3: ADD / EDIT INSPECTION ITEM                                   -->
+  <!-- ===================================================================== -->
+  <div id="item-modal" class="fixed inset-0 z-50 bg-slate-950/70 backdrop-blur-xs hidden items-end sm:items-center justify-center p-0 sm:p-4">
+    <div class="bg-white w-full max-w-lg rounded-t-3xl sm:rounded-2xl shadow-2xl p-5 space-y-4">
+      <div class="flex items-center justify-between border-b border-slate-100 pb-3">
+        <h3 id="item-modal-title" class="text-base font-extrabold text-slate-900">Add Inspection Item</h3>
+        <button onclick="closeItemModal()" class="p-2 rounded-xl bg-slate-100 text-slate-600 hover:bg-slate-200">✕</button>
+      </div>
+
+      <input type="hidden" id="edit-item-id" />
+
+      <div class="space-y-3">
+        <div class="grid grid-cols-2 sm:grid-cols-4 gap-2">
+          <div>
+            <label class="block text-xs font-bold text-slate-600 uppercase mb-1">Session</label>
+            <select id="item-session-select" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-2.5 py-2.5 text-xs sm:text-sm font-semibold text-slate-900 focus:outline-none focus:ring-2 focus:ring-amber-500">
+              <option value="Morning">Morning</option>
+              <option value="Afternoon">Afternoon</option>
+            </select>
+          </div>
+          <div>
+            <label class="block text-xs font-bold text-slate-600 uppercase mb-1">Start time</label>
+            <div class="space-y-1.5"><input id="item-start-time" type="time" step="60" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-2.5 py-2.5 text-xs sm:text-sm font-semibold text-slate-900 focus:outline-none focus:ring-2 focus:ring-amber-500"><button type="button" onclick="useCurrentTime('item-start-time')" class="w-full px-2 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-white text-[11px] font-bold">Use current time</button></div>
+          </div>
+          <div>
+            <label class="block text-xs font-bold text-slate-600 uppercase mb-1">End time</label>
+            <div class="space-y-1.5"><input id="item-end-time" type="time" step="60" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-2.5 py-2.5 text-xs sm:text-sm font-semibold text-slate-900 focus:outline-none focus:ring-2 focus:ring-amber-500"><button type="button" onclick="useCurrentTime('item-end-time')" class="w-full px-2 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-white text-[11px] font-bold">Use current time</button></div>
+          </div>
+          <div>
+            <label class="block text-xs font-bold text-slate-600 uppercase mb-1">Check Mode</label>
+            <select id="item-type-select" onchange="syncStatusOptionsForType('modal')" class="w-full bg-indigo-50 border border-indigo-200 rounded-xl px-2.5 py-2.5 text-xs sm:text-sm font-extrabold text-indigo-900 focus:outline-none focus:ring-2 focus:ring-amber-500">
+              <option value="Inspection">Inspection</option>
+              <option value="Random Check">Random Check</option>
+            </select>
+          </div>
+          <div>
+            <label class="block text-xs font-bold text-slate-600 uppercase mb-1">Inspection Type</label>
+            <select id="item-category-select" class="w-full bg-sky-50 border border-sky-200 rounded-xl px-2.5 py-2.5 text-xs sm:text-sm font-extrabold text-sky-900 focus:outline-none focus:ring-2 focus:ring-amber-500">
+              <option value="Rebar Fixing">Rebar Fixing</option>
+              <option value="MOS">MOS</option>
+              <option value="NDT">NDT</option>
+              <option value="Concreting">Concreting</option>
+              <option value="Formwork">Formwork</option>
+              <option value="Steelwork">Steelwork</option>
+              <option value="Cube Test">Cube Test</option>
+              <option value="General">General</option>
+            </select>
+          </div>
+          <div>
+            <label class="block text-xs font-bold text-slate-600 uppercase mb-1">Result</label>
+            <select id="item-status-select" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-2.5 py-2.5 text-xs sm:text-sm font-semibold text-slate-900 focus:outline-none focus:ring-2 focus:ring-amber-500">
+              <option value="Accepted with comments">✔ Accepted with comments</option>
+              <option value="Accepted with minor defects">⚠️ Accepted with minor defects</option>
+              <option value="Reinspection required">🔄 Reinspection required</option>
+            </select>
+          </div>
+        </div>
+
+        <div>
+          <div class="flex items-center justify-between mb-1">
+            <label class="block text-xs font-bold text-slate-600 uppercase">Inspection Location / Element / Activity</label>
+          </div>
+          <!-- 1-Tap Quick-Fill Chips inside Modal -->
+          <div class="flex items-center gap-1.5 overflow-x-auto no-scrollbar pb-1.5">
+            <button type="button" onclick="fillModalChip('MOS review ', 'Inspection', 'MOS')" class="shrink-0 text-[11px] font-semibold bg-sky-50 hover:bg-sky-100 text-sky-800 px-2 py-1 rounded-lg border border-sky-200">MOS</button>
+            <button type="button" onclick="fillModalChip('Rebar fixing inspection ', 'Inspection', 'Rebar Fixing')" class="shrink-0 text-[11px] font-semibold bg-sky-50 hover:bg-sky-100 text-sky-800 px-2 py-1 rounded-lg border border-sky-200">Rebar Fixing</button>
+            <button type="button" onclick="fillModalChip('NDT inspection ', 'Inspection', 'NDT')" class="shrink-0 text-[11px] font-semibold bg-sky-50 hover:bg-sky-100 text-sky-800 px-2 py-1 rounded-lg border border-sky-200">NDT</button>
+            <button type="button" onclick="fillModalChip('Random check concreting', 'Random Check', 'Concreting')" class="shrink-0 text-[11px] font-semibold bg-indigo-50 hover:bg-indigo-100 text-indigo-800 px-2 py-1 rounded-lg border border-indigo-200">Concreting</button>
+            <button type="button" onclick="fillModalChip('Random check slump', 'Random Check', 'Concreting')" class="shrink-0 text-[11px] font-semibold bg-indigo-50 hover:bg-indigo-100 text-indigo-800 px-2 py-1 rounded-lg border border-indigo-200">Slump</button>
+            <button type="button" onclick="fillModalChip('Formwork check ', 'Inspection', 'Formwork')" class="shrink-0 text-[11px] font-semibold bg-slate-100 hover:bg-amber-100 text-slate-700 px-2 py-1 rounded-lg border border-slate-200">Formwork</button>
+            <button type="button" onclick="fillModalChip('Cube test ', 'Inspection', 'Cube Test')" class="shrink-0 text-[11px] font-semibold bg-slate-100 hover:bg-amber-100 text-slate-700 px-2 py-1 rounded-lg border border-slate-200">Cube test</button>
+            <button type="button" onclick="fillModalChip('Reinspected ', 'Inspection', 'General')" class="shrink-0 text-[11px] font-semibold bg-slate-100 hover:bg-amber-100 text-slate-700 px-2 py-1 rounded-lg border border-slate-200">Reinspection</button>
+          </div>
+          <input id="item-title-input" type="text" placeholder="e.g., BST205 B3 wall rebar or Random check concreting"
+            class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2.5 text-sm font-semibold text-slate-900 focus:outline-none focus:ring-2 focus:ring-amber-500" />
+        </div>
+
+        <div>
+          <label class="block text-xs font-bold text-slate-600 uppercase mb-1">Inspection Remarks / Supplement Notes</label>
+          <textarea id="item-notes-input" rows="2" placeholder="Add specific inspection findings, concrete grade, cube ref, or follow-up notes..."
+            class="w-full bg-slate-50 border border-slate-200 rounded-xl p-3 text-sm text-slate-900 focus:outline-none focus:ring-2 focus:ring-amber-500"></textarea>
+        </div>
+
+        <div class="bg-emerald-50 border border-emerald-200 rounded-xl p-3 space-y-2">
+          <div class="text-xs font-bold text-emerald-900 uppercase">Contractor Attendance</div>
+          <div class="flex flex-wrap gap-4">
+            <label class="flex items-center gap-2 text-sm font-semibold text-slate-800 cursor-pointer">
+              <input id="item-ae-check" type="checkbox" checked class="w-4 h-4 accent-emerald-600 rounded" />
+              <span>Contractor AE Present</span>
+            </label>
+            <label class="flex items-center gap-2 text-sm font-semibold text-slate-800 cursor-pointer">
+              <input id="item-foreman-check" type="checkbox" checked class="w-4 h-4 accent-emerald-600 rounded" />
+              <span>Contractor Foreman Present</span>
+            </label>
+          </div>
+          <input id="item-attendee-note" type="text" placeholder="Optional: Specific AE / Foreman name..."
+            class="w-full bg-white border border-emerald-200 rounded-lg px-2.5 py-1.5 text-xs text-slate-800 focus:outline-none" />
+        </div>
+      </div>
+
+      <div class="flex flex-wrap items-center justify-between gap-2 pt-2">
+        <button id="delete-item-btn" type="button" onclick="deleteCurrentItem()" class="hidden px-3 py-2.5 rounded-xl text-xs font-bold text-rose-600 hover:bg-rose-50">
+          🗑️ Delete
+        </button>
+        <div class="flex items-center gap-2 ml-auto">
+          <button onclick="closeItemModal()" class="px-4 py-2.5 rounded-xl text-xs sm:text-sm font-semibold text-slate-600 hover:bg-slate-100">Cancel</button>
+          <button onclick="saveInspectionItem(false)" class="px-4 py-2.5 rounded-xl text-xs sm:text-sm font-bold bg-slate-900 hover:bg-slate-800 text-white shadow">
+            Save Entry
+          </button>
+          <button onclick="saveInspectionItem(true)" class="px-4 py-2.5 rounded-xl text-xs sm:text-sm font-extrabold bg-amber-500 hover:bg-amber-400 text-slate-950 shadow flex items-center gap-1">
+            <span>📷 Save & Snap</span>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===================================================================== -->
+  <!-- MODAL 7: NEW DATE DIARY MODAL                                         -->
+  <!-- ===================================================================== -->
+  <div id="new-day-modal" class="fixed inset-0 z-50 bg-slate-950/70 backdrop-blur-xs hidden items-center justify-center p-4">
+    <div class="bg-white max-w-sm w-full rounded-2xl p-5 shadow-2xl space-y-4">
+      <div class="flex items-center justify-between border-b border-slate-100 pb-2">
+        <h3 class="text-base font-extrabold text-slate-900">Create / Open Site Diary Date</h3>
+        <button onclick="closeNewDayModal()" class="p-1.5 rounded-lg bg-slate-100 text-slate-600">✕</button>
+      </div>
+      <div class="space-y-3">
+        <div>
+          <label class="block text-xs font-bold text-slate-600 uppercase mb-1">Select Date</label>
+          <input id="new-day-date-picker" type="date" value="2026-11-19"
+            class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2.5 text-sm font-semibold text-slate-900 focus:outline-none focus:ring-2 focus:ring-amber-500" />
+        </div>
+        <label class="flex items-center gap-2 text-xs font-semibold text-slate-700 cursor-pointer bg-slate-50 p-2.5 rounded-xl border border-slate-200">
+          <input id="new-day-copy-items" type="checkbox" class="w-4 h-4 accent-amber-500 rounded" />
+          <span>Copy current day's inspection checklist items</span>
+        </label>
+      </div>
+      <div class="flex justify-end gap-2">
+        <button onclick="closeNewDayModal()" class="px-4 py-2 rounded-xl text-xs font-semibold text-slate-600 hover:bg-slate-100">Cancel</button>
+        <button onclick="confirmCreateNewDay()" class="px-4 py-2 rounded-xl text-xs font-bold bg-amber-500 hover:bg-amber-400 text-slate-950">Create & Auto HK Weather</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===================================================================== -->
+  <!-- MODAL 8: CHOOSE SAVE FOLDER & PHONE BACKUP / RESTORE                  -->
+  <!-- ===================================================================== -->
+  <div id="backup-modal" class="fixed inset-0 z-50 bg-slate-950/75 backdrop-blur-xs hidden items-center justify-center p-4">
+    <div class="bg-white max-w-md w-full rounded-2xl p-5 shadow-2xl space-y-4">
+      <div class="flex items-center justify-between border-b border-slate-100 pb-3">
+        <div>
+          <h3 class="text-base font-extrabold text-slate-900">Choose Local Save Location & Backup</h3>
+          <p class="text-xs text-slate-500">Pick your preferred phone folder or sync multi-day logs</p>
+        </div>
+        <button onclick="closeBackupModal()" class="p-2 rounded-xl bg-slate-100 text-slate-600 hover:bg-slate-200">✕</button>
+      </div>
+
+      <!-- Linked Local Folder / File Status Card -->
+      <div class="bg-emerald-50 border border-emerald-200 rounded-xl p-3 space-y-2">
+        <div class="flex items-center justify-between">
+          <span class="text-xs font-extrabold text-emerald-900 uppercase">📂 Chosen Local File / Folder</span>
+          <span id="linked-folder-badge" class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-white text-emerald-800 border border-emerald-300">Auto-IndexedDB Active</span>
+        </div>
+        <p id="linked-location-text" class="text-xs text-emerald-950 font-medium">
+          No custom folder linked yet. Tap <strong>"Choose Local Save Location"</strong> below to pick any folder on your phone (e.g., <em>On My iPhone, iCloud Drive, Google Drive, or Downloads</em>).
+        </p>
+        <div class="flex flex-wrap gap-2 pt-1">
+          <button onclick="chooseCustomLocalSaveLocation()" class="flex-1 bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs px-3.5 py-2.5 rounded-xl shadow flex items-center justify-center gap-1.5">
+            <span>📁 Choose Local Save Location</span>
+          </button>
+          <button id="sync-linked-now-btn" onclick="syncNowToChosenLocation()" class="hidden bg-slate-900 hover:bg-slate-800 text-white font-bold text-xs px-3 py-2.5 rounded-xl shadow">
+            🔄 Sync Now
+          </button>
+        </div>
+      </div>
+
+      <div class="bg-sky-50 border border-sky-200 rounded-xl p-3 text-xs text-sky-900 space-y-1.5">
+        <div class="font-bold">📍 How Local Saving Works on iPhone & Android:</div>
+        <p><strong>• Instant Phone Database:</strong> Every edit and photo auto-saves inside your phone's local storage (<code id="storage-origin-label" class="bg-white px-1 rounded border border-sky-200 font-mono-code text-[10px]">IndexedDB</code>) so you never lose progress offline.</p>
+        <p><strong>• Custom Folder / Share Sheet:</strong> Tapping <strong>Choose Local Save Location</strong> opens your phone's native folder/file picker (or iOS/Android <strong>Save to Files</strong> sheet) so you can choose the exact folder where your diary file is stored.</p>
+      </div>
+
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5 pt-1">
+        <button onclick="downloadFullBackupJSON()" class="bg-slate-900 hover:bg-slate-800 text-white font-bold text-xs px-4 py-3 rounded-xl shadow flex items-center justify-center gap-2">
+          <span>📥 Save Copy to Downloads</span>
+        </button>
+
+        <label class="cursor-pointer bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold text-xs px-4 py-3 rounded-xl shadow flex items-center justify-center gap-2">
+          <span>📤 Open / Restore File</span>
+          <input type="file" accept=".json,application/json" onchange="restoreFullBackupJSON(event)" class="hidden" />
+        </label>
+      </div>
+
+      <div class="flex justify-end pt-1">
+        <button onclick="closeBackupModal()" class="px-4 py-2 rounded-xl text-xs font-semibold text-slate-600 hover:bg-slate-100">Close</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===================================================================== -->
+  <!-- MODAL 4: FULL-SCREEN PHOTO VIEWER                                     -->
+  <!-- ===================================================================== -->
+  <div id="photo-viewer-modal" class="fixed inset-0 z-50 bg-slate-950/95 hidden flex-col items-center justify-between p-4">
+    <div class="w-full max-w-2xl flex items-center justify-between text-white">
+      <h4 id="viewer-title" class="text-sm font-bold truncate pr-3">Site Photo</h4>
+      <button onclick="closePhotoViewer()" class="p-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200">✕</button>
+    </div>
+    <div class="flex-1 flex items-center justify-center max-w-2xl w-full overflow-hidden my-3">
+      <img id="viewer-img" src="" alt="Site inspection photo" class="max-h-full max-w-full rounded-xl object-contain border border-slate-700" />
+    </div>
+    <div class="w-full max-w-2xl flex items-center justify-between gap-2 text-xs text-slate-300">
+      <span id="viewer-meta" class="truncate"></span>
+      <button id="viewer-delete-btn" class="px-3.5 py-2 rounded-xl bg-rose-600 hover:bg-rose-500 text-white font-bold shrink-0">
+        🗑️ Delete Photo
+      </button>
+    </div>
+  </div>
+
+  <!-- ===================================================================== -->
+  <!-- MODAL 5: EXPORT SITE DIARY REPORT                                     -->
+  <!-- ===================================================================== -->
+  <div id="export-modal" class="fixed inset-0 z-50 bg-slate-950/75 backdrop-blur-xs hidden items-end sm:items-center justify-center p-0 sm:p-4">
+    <div class="bg-white w-full max-w-xl rounded-t-3xl sm:rounded-2xl shadow-2xl p-5 space-y-4">
+      <div class="flex items-center justify-between border-b border-slate-100 pb-3">
+        <div>
+          <h3 class="text-base font-extrabold text-slate-900">Export Site Inspection Diary</h3>
+          <p class="text-xs text-slate-500">Copy formatted diary text for WhatsApp, Email, or Site Record</p>
+        </div>
+        <button onclick="closeExportModal()" class="p-2 rounded-xl bg-slate-100 text-slate-600 hover:bg-slate-200">✕</button>
+      </div>
+      <textarea id="export-preview-text" rows="12" readonly
+        class="w-full bg-slate-50 border border-slate-200 rounded-xl p-3 text-xs font-mono-code text-slate-800 focus:outline-none"></textarea>
+      <div id="a4-print-report"></div>
+      <div class="no-print mt-3 text-[11px] text-slate-500">Print settings: Paper size <strong>A4</strong>. For physical printing, enable <strong>Two-sided / Duplex</strong> and use <strong>Flip on long edge</strong>.</div>
+      <div class="flex flex-wrap items-center justify-end gap-2">
+        <button onclick="printA4Diary()" class="px-4 py-2.5 rounded-xl text-xs font-bold bg-slate-100 hover:bg-slate-200 text-slate-800">
+          🖨️ Export Personal Logbook PDF
+        </button>
+        <button onclick="copyExportText()" class="px-5 py-2.5 rounded-xl text-xs sm:text-sm font-extrabold bg-amber-500 hover:bg-amber-400 text-slate-950 shadow">
+          📋 Copy Diary Text
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===================================================================== -->
+  <!-- MODAL 6: RESET DAY CONFIRMATION                                       -->
+  <!-- ===================================================================== -->
+  <div id="reset-modal" class="fixed inset-0 z-50 bg-slate-950/75 backdrop-blur-xs hidden items-center justify-center p-4">
+    <div class="bg-white max-w-sm w-full rounded-2xl p-5 shadow-2xl space-y-4">
+      <h3 class="text-base font-extrabold text-slate-900">Reset Current Day Diary?</h3>
+      <p class="text-xs text-slate-600 leading-relaxed">
+        This will restore <strong id="reset-date-label">17/11/2026</strong> back to its default checklist and clear photos/defect messages logged on this date.
+      </p>
+      <div class="flex justify-end gap-2">
+        <button onclick="closeResetModal()" class="px-4 py-2 rounded-xl text-xs font-semibold text-slate-600 hover:bg-slate-100">Cancel</button>
+        <button onclick="confirmResetDay()" class="px-4 py-2 rounded-xl text-xs font-bold bg-rose-600 hover:bg-rose-500 text-white">Reset Day</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===================================================================== -->
+  <!-- MODAL 9: SELECT & IMPORT PREVIOUS ENTRIES FROM PAST DAYS              -->
+  <!-- ===================================================================== -->
+  <div id="prev-entries-modal" class="fixed inset-0 z-50 bg-slate-950/75 backdrop-blur-xs hidden items-end sm:items-center justify-center p-0 sm:p-4">
+    <div class="bg-white w-full max-w-xl rounded-t-3xl sm:rounded-2xl shadow-2xl p-5 flex flex-col max-h-[88vh] space-y-3">
+      <div class="flex items-center justify-between border-b border-slate-100 pb-3">
+        <div>
+          <h3 class="text-base font-extrabold text-slate-900">Select Previous Entries</h3>
+          <p class="text-xs text-slate-500">Pick past inspection locations/items to add into <strong id="prev-target-date-label">current day</strong></p>
+        </div>
+        <button onclick="closePreviousEntriesModal()" class="p-2 rounded-xl bg-slate-100 text-slate-600 hover:bg-slate-200">✕</button>
+      </div>
+
+      <div class="flex flex-wrap items-center gap-2">
+        <select id="prev-source-date-select" onchange="renderPreviousEntriesList()"
+          class="flex-1 bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs sm:text-sm font-bold text-slate-900 focus:outline-none focus:ring-2 focus:ring-amber-500">
+        </select>
+        <button type="button" onclick="toggleSelectAllPrevEntries(true)" class="text-xs font-bold bg-slate-100 hover:bg-slate-200 text-slate-700 px-3 py-2 rounded-xl">
+          Select All
+        </button>
+        <button type="button" onclick="toggleSelectAllPrevEntries(false)" class="text-xs font-bold bg-slate-100 hover:bg-slate-200 text-slate-700 px-3 py-2 rounded-xl">
+          Clear
+        </button>
+      </div>
+
+      <div id="prev-entries-list" class="flex-1 overflow-y-auto space-y-2 border border-slate-100 rounded-xl p-2 bg-slate-50/60">
+      </div>
+
+      <div class="flex flex-wrap items-center justify-between gap-2 pt-2 border-t border-slate-100">
+        <label class="flex items-center gap-2 text-xs font-semibold text-slate-700 cursor-pointer">
+          <input id="prev-include-notes" type="checkbox" class="w-4 h-4 accent-amber-500 rounded" />
+          <span>Also copy remarks/notes</span>
+        </label>
+        <div class="flex items-center gap-2">
+          <button onclick="closePreviousEntriesModal()" class="px-4 py-2 rounded-xl text-xs font-semibold text-slate-600 hover:bg-slate-100">Cancel</button>
+          <button onclick="importSelectedPreviousEntries()" class="px-4 py-2.5 rounded-xl text-xs sm:text-sm font-extrabold bg-sky-600 hover:bg-sky-500 text-white shadow">
+            + Add Selected Entries
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // =========================================================================
+    // 1. MULTI-DAY INDEXEDDB PHONE STORAGE ENGINE & HK WEATHER LOOKUP
+    // =========================================================================
+    const DB_NAME = 'QCS_Site_Diary_Phone_DB';
+    const DB_VERSION = 1;
+    const STORE_NAME = 'diaries';
+    const ACTIVE_DATE_KEY = 'qcs_active_diary_date_v3';
+    var toastTimer = null;
+
+    // Hong Kong Observatory Daily Weather Reference & Live/Forecast Lookup
+    const HK_WEATHER_ARCHIVE = {
+      '15/11/2026': {
+        weather: 'Mainly cloudy with sunny periods',
+        temp: '22-26°C',
+        note: 'HK Observatory (15/11/2026): Mainly cloudy with sunny periods, moderate easterly winds (22–26°C).'
+      },
+      '16/11/2026': {
+        weather: 'Sunny and dry',
+        temp: '23-28°C',
+        note: 'HK Observatory (16/11/2026): Sunny and dry during the day, light to moderate easterly winds (23–28°C).'
+      },
+      '17/11/2026': {
+        weather: 'Mainly cloudy with sunny periods',
+        temp: '23-27°C',
+        note: 'HK Observatory (17/11/2026): Mainly cloudy with sunny periods during the day, moderate east to southeasterly winds (23–27°C).'
+      },
+      '18/11/2026': {
+        weather: 'Fine and dry',
+        temp: '21-26°C',
+        note: 'HK Observatory (18/11/2026): Fine and dry with moderate northeasterly winds, slightly cooler in the morning (21–26°C).'
+      },
+      '19/11/2026': {
+        weather: 'Sunny and dry',
+        temp: '20-25°C',
+        note: 'HK Observatory (19/11/2026): Sunny and dry, moderate north to northeasterly winds (20–25°C).'
+      },
+      '20/11/2026': {
+        weather: 'Fine and dry',
+        temp: '21-26°C',
+        note: 'HK Observatory (20/11/2026): Fine and dry during the day (21–26°C).'
+      }
+    };
+
+    function normalizeDateKey(dateStr) {
+      const cleaned = (dateStr || '').trim();
+      // Convert YYYY-MM-DD to DD/MM/YYYY if needed
+      const isoMatch = cleaned.match(/^(\d{4})-(\d{1,2})-(\d{1,2})$/);
+      if (isoMatch) {
+        return `${isoMatch[3].padStart(2, '0')}/${isoMatch[2].padStart(2, '0')}/${isoMatch[1]}`;
+      }
+      const dmyMatch = cleaned.match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})$/);
+      if (dmyMatch) {
+        return `${dmyMatch[1].padStart(2, '0')}/${dmyMatch[2].padStart(2, '0')}/${dmyMatch[3]}`;
+      }
+      return cleaned || getTodayDateKey();
+    }
+
+
+    function getTodayDateKey() {
+      const now = new Date();
+      const dd = String(now.getDate()).padStart(2, '0');
+      const mm = String(now.getMonth() + 1).padStart(2, '0');
+      const yyyy = now.getFullYear();
+      return `${dd}/${mm}/${yyyy}`;
+    }
+
+    function dateStrToISO(dmyStr) {
+      const m = normalizeDateKey(dmyStr).match(/^(\d{2})\/(\d{2})\/(\d{4})$/);
+      return m ? `${m[3]}-${m[2]}-${m[1]}` : '2026-11-17';
+    }
+
+    function lookupHKWeather(dateStr) {
+      const norm = normalizeDateKey(dateStr);
+      if (HK_WEATHER_ARCHIVE[norm]) {
+        return HK_WEATHER_ARCHIVE[norm];
+      }
+      // Seasonal Hong Kong climatology fallback based on month
+      const m = norm.match(/^(\d{2})\/(\d{2})\/(\d{4})$/);
+      const month = m ? parseInt(m[2], 10) : 11;
+      if (month >= 5 && month <= 9) {
+        return {
+          weather: 'Cloudy with a few rain patches',
+          temp: '28-33°C',
+          note: `HK Observatory (${norm}): Hot with sunny intervals and isolated showers (28–33°C).`
+        };
+      } else if (month === 10 || month === 11) {
+        return {
+          weather: 'Fine and dry',
+          temp: '21-26°C',
+          note: `HK Observatory (${norm}): Fine and dry autumn weather with moderate easterly/northeasterly winds (21–26°C).`
+        };
+      } else if (month === 12 || month <= 2) {
+        return {
+          weather: 'Sunny and dry',
+          temp: '15-20°C',
+          note: `HK Observatory (${norm}): Cool and dry winter weather (15–20°C).`
+        };
+      } else {
+        return {
+          weather: 'Mainly cloudy with sunny periods',
+          temp: '20-25°C',
+          note: `HK Observatory (${norm}): Mainly cloudy with sunny intervals (20–25°C).`
+        };
+      }
+    }
+
+    function buildDefaultDiaryForDate(dateStr, previousMeta = null) {
+      const normDate = normalizeDateKey(dateStr);
+      const hkW = lookupHKWeather(normDate);
+
+      if (normDate === '17/11/2026') {
+        return {
+          dateKey: '17/11/2026',
+          updatedAt: Date.now(),
+          meta: {
+            inspector: 'Chan Wing Yiu',
+            role: 'QCS',
+            date: '17/11/2026',
+            weather: hkW.weather,
+            temp: hkW.temp,
+            generalNotes: hkW.note
+          },
+          inspections: [
+            { id: 'insp-1', session: 'Morning', entryType: 'Inspection', inspectionCategory: 'Cube Test', status: 'Accepted with comments', title: 'August Cube Test report checking', notes: '', aePresent: true, foremanPresent: true, attendeeNote: '', defects: [], photos: [] },
+            { id: 'insp-2', session: 'Afternoon', entryType: 'Inspection', inspectionCategory: 'General', status: 'Accepted with comments', title: 'BST209 B4M-B3', notes: '', aePresent: true, foremanPresent: true, attendeeNote: '', defects: [], photos: [] },
+            { id: 'insp-3', session: 'Afternoon', entryType: 'Inspection', inspectionCategory: 'General', status: 'Accepted with comments', title: 'BST210 B4-B4M', notes: '', aePresent: true, foremanPresent: true, attendeeNote: '', defects: [], photos: [] },
+            { id: 'insp-4', session: 'Afternoon', entryType: 'Inspection', inspectionCategory: 'General', status: 'Accepted with comments', title: 'BST223 B4M HL to B3', notes: '', aePresent: true, foremanPresent: true, attendeeNote: '', defects: [], photos: [] },
+            { id: 'insp-5', session: 'Afternoon', entryType: 'Inspection', inspectionCategory: 'General', status: 'Accepted with comments', title: 'C12J B4M-B3', notes: '', aePresent: true, foremanPresent: true, attendeeNote: '', defects: [], photos: [] },
+            { id: 'insp-6', session: 'Afternoon', entryType: 'Inspection', inspectionCategory: 'General', status: 'Accepted with comments', title: 'C149 Column Head reinspected', notes: '', aePresent: true, foremanPresent: true, attendeeNote: '', defects: [], photos: [] },
+            { id: 'insp-7', session: 'Afternoon', entryType: 'Random Check', inspectionCategory: 'Concreting', status: 'OK', title: 'Random check concreting', notes: '', aePresent: true, foremanPresent: true, attendeeNote: '', defects: [], photos: [] },
+            { id: 'insp-8', session: 'Afternoon', entryType: 'Random Check', inspectionCategory: 'Steelwork', status: 'OK', title: 'Random check steelwork stiffener', notes: '', aePresent: true, foremanPresent: true, attendeeNote: '', defects: [], photos: [] },
+            { id: 'insp-9', session: 'Afternoon', entryType: 'Random Check', inspectionCategory: 'Rebar Fixing', status: 'OK', title: 'Random check zone 18 btm rebar', notes: '', aePresent: true, foremanPresent: true, attendeeNote: '', defects: [], photos: [] },
+            { id: 'insp-10', session: 'Afternoon', entryType: 'Inspection', inspectionCategory: 'General', status: 'Accepted with comments', title: 'BST203 B3M landing', notes: '', aePresent: true, foremanPresent: true, attendeeNote: '', defects: [], photos: [] },
+            { id: 'insp-11', session: 'Afternoon', entryType: 'Random Check', inspectionCategory: 'Concreting', status: 'OK', title: 'Random check slump', notes: '', aePresent: true, foremanPresent: true, attendeeNote: '', defects: [], photos: [] }
+          ]
+        };
+      }
+
+      return {
+        dateKey: normDate,
+        updatedAt: Date.now(),
+        meta: {
+          inspector: (previousMeta && previousMeta.inspector) || 'Chan Wing Yiu',
+          role: (previousMeta && previousMeta.role) || 'QCS',
+          date: normDate,
+          weather: hkW.weather,
+          temp: hkW.temp,
+          generalNotes: hkW.note
+        },
+        inspections: []
+      };
+    }
+
+    // IndexedDB Wrapper for High-Capacity Multi-Day Phone Storage
+    var dbPromise = null;
+    function openPhoneDB() {
+      if (dbPromise) return dbPromise;
+      dbPromise = new Promise((resolve, reject) => {
+        if (!window.indexedDB) {
+          reject(new Error('IndexedDB not supported'));
+          return;
+        }
+        const request = indexedDB.open(DB_NAME, DB_VERSION);
+        request.onupgradeneeded = function(e) {
+          const db = e.target.result;
+          if (!db.objectStoreNames.contains(STORE_NAME)) {
+            db.createObjectStore(STORE_NAME, { keyPath: 'dateKey' });
+          }
+        };
+        request.onsuccess = function(e) {
+          resolve(e.target.result);
+        };
+        request.onerror = function(e) {
+          reject(e.target.error);
+        };
+      });
+      return dbPromise;
+    }
+
+    async function dbPutDiary(diaryObj) {
+      if (!diaryObj || typeof diaryObj !== 'object') throw new Error('Invalid diary record');
+      diaryObj.meta = diaryObj.meta || {};
+      diaryObj.dateKey = normalizeDateKey(diaryObj.dateKey || diaryObj.meta.date || diaryObj.date || diaryObj.day);
+      diaryObj.meta.date = diaryObj.dateKey;
+      diaryObj.inspections = Array.isArray(diaryObj.inspections) ? diaryObj.inspections : [];
+      diaryObj.updatedAt = Date.now();
+      try {
+        const db = await openPhoneDB();
+        await new Promise((resolve, reject) => {
+          const tx = db.transaction(STORE_NAME, 'readwrite');
+          tx.objectStore(STORE_NAME).put(diaryObj);
+          tx.oncomplete = resolve;
+          tx.onerror = () => reject(tx.error);
+        });
+      } catch (err) {
+        console.warn('IndexedDB fallback to localStorage:', err);
+        localStorage.setItem('qcs_fallback_' + diaryObj.dateKey, JSON.stringify(diaryObj));
+      }
+    }
+
+    async function dbGetDiary(dateKey) {
+      const norm = normalizeDateKey(dateKey);
+      try {
+        const db = await openPhoneDB();
+        const res = await new Promise((resolve, reject) => {
+          const tx = db.transaction(STORE_NAME, 'readonly');
+          const req = tx.objectStore(STORE_NAME).get(norm);
+          req.onsuccess = () => resolve(req.result);
+          req.onerror = () => reject(req.error);
+        });
+        if (res) return res;
+      } catch (err) {
+        const fb = localStorage.getItem('qcs_fallback_' + norm);
+        if (fb) return JSON.parse(fb);
+      }
+      return null;
+    }
+
+    async function dbGetAllDiaries() {
+      try {
+        const db = await openPhoneDB();
+        const list = await new Promise((resolve, reject) => {
+          const tx = db.transaction(STORE_NAME, 'readonly');
+          const req = tx.objectStore(STORE_NAME).getAll();
+          req.onsuccess = () => resolve(req.result || []);
+          req.onerror = () => reject(req.error);
+        });
+        return list;
+      } catch (err) {
+        return [];
+      }
+    }
+
+    async function dbDeleteDiary(dateKey) {
+      const norm = normalizeDateKey(dateKey);
+      try {
+        const db = await openPhoneDB();
+        await new Promise((resolve, reject) => {
+          const tx = db.transaction(STORE_NAME, 'readwrite');
+          tx.objectStore(STORE_NAME).delete(norm);
+          tx.oncomplete = resolve;
+          tx.onerror = () => reject(tx.error);
+        });
+      } catch (err) {
+        localStorage.removeItem('qcs_fallback_' + norm);
+      }
+    }
+
+    var appState = null;
+    var diaryCache = [];
+    appState = buildDefaultDiaryForDate(getTodayDateKey(), null);
+
+    async function initAppStorage() {
+      // Request persistent phone storage permission so mobile OS won't evict site photos
+      if (navigator.storage && navigator.storage.persist) {
+        try {
+          await navigator.storage.persist();
+        } catch (e) {}
+      }
+
+      // Migrate legacy v2 single-day storage if present
+      const legacyRaw = localStorage.getItem('qcs_site_diary_2026_11_17_v2');
+      if (legacyRaw) {
+        try {
+          const legacyParsed = JSON.parse(legacyRaw);
+          legacyParsed.dateKey = normalizeDateKey(legacyParsed.meta.date || '17/11/2026');
+          await dbPutDiary(legacyParsed);
+          localStorage.removeItem('qcs_site_diary_2026_11_17_v2');
+        } catch (e) {}
+      }
+
+      diaryCache = await dbGetAllDiaries();
+      if (diaryCache.length === 0) {
+        const initialDiary = buildDefaultDiaryForDate(getTodayDateKey(), null);
+        await dbPutDiary(initialDiary);
+        diaryCache = [initialDiary];
+      }
+
+      const preferredDate = localStorage.getItem(ACTIVE_DATE_KEY) || getTodayDateKey();
+      const todayKey = getTodayDateKey();
+      let todayDiary = await dbGetDiary(todayKey);
+      if (!todayDiary) {
+        todayDiary = buildDefaultDiaryForDate(todayKey, appState && appState.meta ? appState.meta : null);
+        await dbPutDiary(todayDiary);
+        diaryCache = await dbGetAllDiaries();
+      }
+      const found = await dbGetDiary(preferredDate);
+      // On each fresh page load, use today's diary. Older diaries remain saved and selectable above.
+      appState = todayDiary || found || diaryCache[0];
+      localStorage.setItem(ACTIVE_DATE_KEY, appState.dateKey);
+
+      initUI();
+    }
+
+    async function saveState(showFeedback = false) {
+      await dbPutDiary(appState);
+      diaryCache = await dbGetAllDiaries();
+      renderSavedDaysBar();
+      updateStats();
+      if (showFeedback) showToast('Saved to phone storage');
+    }
+
+    // =========================================================================
+    // 2. MULTI-DAY SWITCHING & AUTOMATIC HK WEATHER SYNC
+    // =========================================================================
+    function renderSavedDaysBar() {
+      const container = document.getElementById('saved-days-pills');
+      const countEl = document.getElementById('saved-days-count');
+      if (!container) return;
+
+      // Sort chronologically by ISO date
+      const sorted = [...diaryCache].sort((a, b) =>
+        dateStrToISO(a.dateKey).localeCompare(dateStrToISO(b.dateKey))
+      );
+
+      countEl.textContent = sorted.length;
+      container.innerHTML = sorted.map(d => {
+        const isActive = d.dateKey === appState.dateKey;
+        const itemCount = d.inspections ? d.inspections.length : 0;
+        const photoCount = d.inspections ? d.inspections.reduce((acc, i) => acc + (i.photos ? i.photos.length : 0), 0) : 0;
+
+        return `
+          <button onclick="switchDiaryDate('${d.dateKey}')"
+            class="shrink-0 px-3 py-2 rounded-xl border text-left transition flex items-center gap-2 ${
+              isActive
+                ? 'bg-amber-500 text-slate-950 border-amber-500 font-extrabold shadow-xs'
+                : 'bg-slate-50 hover:bg-slate-100 text-slate-700 border-slate-200 font-semibold'
+            }">
+            <div>
+              <div class="text-xs leading-tight">${escapeHTML(d.dateKey)}</div>
+              <div class="text-[10px] ${isActive ? 'text-slate-900/80' : 'text-slate-400'}">
+                ${itemCount} items${photoCount > 0 ? ` • 📷 ${photoCount}` : ''}
+              </div>
+            </div>
+          </button>
+        `;
+      }).join('');
+    }
+
+    async function switchDiaryDate(dateKey) {
+      const target = await dbGetDiary(dateKey);
+      if (!target) return;
+      appState = target;
+      localStorage.setItem(ACTIVE_DATE_KEY, appState.dateKey);
+      initUI();
+      showToast(`Loaded diary for ${appState.dateKey}`);
+    }
+
+    async function handleDateChange(newDateRaw) {
+      const oldKey = appState.dateKey;
+      const newKey = normalizeDateKey(newDateRaw);
+      document.getElementById('meta-date').value = newKey;
+
+      // Check if a saved log already exists for the new date
+      const existingTarget = await dbGetDiary(newKey);
+      if (existingTarget && existingTarget.dateKey !== oldKey) {
+        appState = existingTarget;
+        localStorage.setItem(ACTIVE_DATE_KEY, appState.dateKey);
+        initUI();
+        showToast(`Switched to saved log for ${newKey}`);
+        return;
+      }
+
+      // Otherwise update current diary's date and auto-sync HK weather
+      appState.meta.date = newKey;
+      appState.dateKey = newKey;
+      if (oldKey && oldKey !== newKey) {
+        await dbDeleteDiary(oldKey);
+      }
+      localStorage.setItem(ACTIVE_DATE_KEY, newKey);
+      await syncWeatherForCurrentDate(false);
+      await saveState(false);
+      initUI();
+      showToast(`Date updated to ${newKey} & HK weather synced`);
+    }
+
+    async function syncWeatherForCurrentDate(showFeedback = true) {
+      const normDate = normalizeDateKey(appState.meta.date);
+      const hkW = lookupHKWeather(normDate);
+
+      appState.meta.weather = hkW.weather;
+      appState.meta.temp = hkW.temp;
+
+      // Update HK Observatory note if generalNotes is empty or was previously an auto HK Observatory line
+      if (!appState.meta.generalNotes || appState.meta.generalNotes.startsWith('HK Observatory (')) {
+        appState.meta.generalNotes = hkW.note;
+      }
+
+      // Attempt live Hong Kong Observatory API enrichment if today's date (18/11/2026) is active
+      if (normDate === getTodayDateKey()) {
+        try {
+          const resp = await fetch('https://data.weather.gov.hk/weatherAPI/opendata/weather.php?dataType=fnd&lang=en');
+          if (resp.ok) {
+            const data = await resp.json();
+            if (data && data.weatherForecast && data.weatherForecast.length > 0) {
+              const todayFc = data.weatherForecast[0];
+              const minT = todayFc.forecastMintemp?.value;
+              const maxT = todayFc.forecastMaxtemp?.value;
+              if (minT && maxT) {
+                appState.meta.temp = `${minT}-${maxT}°C`;
+              }
+              if (todayFc.forecastWeather) {
+                appState.meta.generalNotes = `HK Observatory (${normDate}): ${todayFc.forecastWeather} (${appState.meta.temp}).`;
+              }
+            }
+          }
+        } catch (e) {
+          // Offline / CORS safe fallback already populated from HK_WEATHER_ARCHIVE
+        }
+      }
+
+      document.getElementById('meta-weather').value = appState.meta.weather;
+      document.getElementById('meta-temp').value = appState.meta.temp;
+      document.getElementById('general-notes').value = appState.meta.generalNotes;
+
+      await saveState(false);
+      if (showFeedback) {
+        showToast(`HK weather updated for ${normDate}: ${appState.meta.weather} (${appState.meta.temp})`);
+      }
+    }
+
+    function openNewDayModal() {
+      document.getElementById('new-day-date-picker').value = dateStrToISO(getTodayDateKey());
+      document.getElementById('new-day-copy-items').checked = false;
+      const modal = document.getElementById('new-day-modal');
+      modal.classList.remove('hidden');
+      modal.classList.add('flex');
+    }
+
+    function closeNewDayModal() {
+      const modal = document.getElementById('new-day-modal');
+      modal.classList.add('hidden');
+      modal.classList.remove('flex');
+    }
+
+    async function createNewDayDiary(mode) {
+      const targetDate = mode === 'today' ? getTodayDateKey() : normalizeDateKey(document.getElementById('new-day-date-picker').value);
+      const copyItems = mode === 'today' ? false : document.getElementById('new-day-copy-items').checked;
+
+      const existing = await dbGetDiary(targetDate);
+      if (existing) {
+        appState = existing;
+        localStorage.setItem(ACTIVE_DATE_KEY, appState.dateKey);
+        closeNewDayModal();
+        initUI();
+        showToast(`Opened existing log for ${targetDate}`);
+        return;
+      }
+
+      const fresh = buildDefaultDiaryForDate(targetDate, appState && appState.meta ? appState.meta : null);
+      if (copyItems && appState.inspections.length > 0) {
+        fresh.inspections = appState.inspections.map((item, idx) => {
+          const entryType = inferEntryType(item);
+          const inspectionCategory = inferInspectionCategory(item);
+          return {
+            id: `insp-${Date.now()}-${idx}`,
+            session: item.session,
+            entryType,
+            inspectionCategory,
+            status: entryType === 'Random Check' ? 'OK' : 'Accepted with comments',
+            title: item.title,
+            notes: '',
+            aePresent: true,
+            foremanPresent: true,
+            attendeeNote: item.attendeeNote || '',
+            defects: [],
+            photos: []
+          };
+        });
+      }
+
+      await dbPutDiary(fresh);
+      diaryCache = await dbGetAllDiaries();
+      appState = fresh;
+      localStorage.setItem(ACTIVE_DATE_KEY, appState.dateKey);
+      closeNewDayModal();
+      initUI();
+      showToast(`Created diary for ${targetDate} with HK weather`);
+    }
+
+    async function confirmCreateNewDay() {
+      await createNewDayDiary('picker');
+    }
+
+    // =========================================================================
+    // 3. UI INITIALIZATION & METADATA HELPERS
+    // =========================================================================
+    function initUI() {
+      if (!appState || !appState.meta) return;
+      appState.inspections = Array.isArray(appState.inspections) ? appState.inspections : [];
+      const todayBtn = document.getElementById('today-button');
+      if (todayBtn) {
+        const t = getTodayDateKey().split('/');
+        todayBtn.textContent = `+ Today (${t[0]}/${t[1]})`;
+      }
+      document.getElementById('meta-inspector').value = appState.meta.inspector || 'Chan Wing Yiu';
+      document.getElementById('meta-role').value = appState.meta.role || 'QCS';
+      document.getElementById('meta-date').value = appState.meta.date || '17/11/2026';
+      document.getElementById('meta-weather').value = appState.meta.weather || 'Mainly cloudy with sunny periods';
+      document.getElementById('meta-temp').value = appState.meta.temp || '23-27°C';
+      document.getElementById('general-notes').value = appState.meta.generalNotes || '';
+
+      syncStatusOptionsForType('quick');
+      renderSavedDaysBar();
+      renderInspections();
+      updateStats();
+    }
+
+    async function updateMeta(field, value) {
+      appState.meta[field] = value;
+      await saveState(true);
+    }
+
+    function updateStats() {
+      const total = appState.inspections.length;
+      const bothPresent = appState.inspections.filter(i => i.aePresent && i.foremanPresent).length;
+      const totalDefects = appState.inspections.reduce((sum, i) => sum + (i.defects ? i.defects.length : 0), 0);
+      const totalPhotos = appState.inspections.reduce((sum, i) => sum + (i.photos ? i.photos.length : 0), 0);
+
+      document.getElementById('stat-total').textContent = total;
+      document.getElementById('stat-attendance').textContent = `${bothPresent}/${total}`;
+      document.getElementById('stat-defects').textContent = totalDefects;
+      document.getElementById('stat-photos').textContent = totalPhotos;
+    }
+
+    // =========================================================================
+    // 4. INSPECTION CARD RENDERING
+    // =========================================================================
+    const INSPECTION_CATEGORIES = [
+      'Rebar Fixing',
+      'MOS',
+      'NDT',
+      'Concreting',
+      'Formwork',
+      'Steelwork',
+      'Cube Test',
+      'General'
+    ];
+
+    function inferEntryType(item) {
+      if (item.entryType) return item.entryType;
+      return (item.title || '').toLowerCase().includes('random check') ? 'Random Check' : 'Inspection';
+    }
+
+    function inferInspectionCategory(item) {
+      if (item.inspectionCategory) return item.inspectionCategory;
+      const t = (item.title || '').toLowerCase();
+      if (t.includes('mos')) return 'MOS';
+      if (t.includes('ndt')) return 'NDT';
+      if (t.includes('rebar')) return 'Rebar Fixing';
+      if (t.includes('concreting') || t.includes('slump')) return 'Concreting';
+      if (t.includes('formwork')) return 'Formwork';
+      if (t.includes('steelwork')) return 'Steelwork';
+      if (t.includes('cube')) return 'Cube Test';
+      return 'General';
+    }
+
+    function getStatusOptionsForType(entryType) {
+      if (entryType === 'Random Check') {
+        return [
+          { value: 'OK', label: '✔ OK' },
+          { value: 'Not OK and rectified', label: '🔧 Not OK and rectified' },
+          { value: 'Not OK', label: '⚠️ Not OK' }
+        ];
+      }
+      return [
+        { value: 'Accepted with comments', label: '✔ Accepted with comments' },
+        { value: 'Accepted with minor defects', label: '⚠️ Accepted with minor defects' },
+        { value: 'Reinspection required', label: '🔄 Reinspection required' }
+      ];
+    }
+
+    function syncStatusOptionsForType(target, selectedValue = null) {
+      const typeSelectId = target === 'quick' ? 'quick-type' : 'item-type-select';
+      const statusSelectId = target === 'quick' ? 'quick-status' : 'item-status-select';
+      const entryType = document.getElementById(typeSelectId).value;
+      const statusSelect = document.getElementById(statusSelectId);
+      const options = getStatusOptionsForType(entryType);
+
+      statusSelect.innerHTML = options.map(opt =>
+        `<option value="${opt.value}">${opt.label}</option>`
+      ).join('');
+
+      if (selectedValue && options.some(o => o.value === selectedValue)) {
+        statusSelect.value = selectedValue;
+      }
+    }
+
+    function renderInspections() {
+      const morningList = document.getElementById('morning-list');
+      const afternoonList = document.getElementById('afternoon-list');
+      const query = document.getElementById('search-input').value.trim().toLowerCase();
+      const statusFilter = document.getElementById('filter-status').value;
+
+      morningList.innerHTML = '';
+      afternoonList.innerHTML = '';
+
+      appState.inspections.forEach((item, idx) => {
+        const entryType = inferEntryType(item);
+        const inspectionCategory = inferInspectionCategory(item);
+        const defaultStatus = entryType === 'Random Check' ? 'OK' : 'Accepted with comments';
+        const currentStatus = item.status || defaultStatus;
+
+        // Apply search & filter
+        const matchesQuery = !query ||
+          item.title.toLowerCase().includes(query) ||
+          entryType.toLowerCase().includes(query) ||
+          inspectionCategory.toLowerCase().includes(query) ||
+          (item.notes && item.notes.toLowerCase().includes(query)) ||
+          (item.defects && item.defects.some(d => d.text.toLowerCase().includes(query)));
+
+        const matchesStatus =
+          statusFilter === 'all' ||
+          (statusFilter === 'type-Inspection' && entryType === 'Inspection') ||
+          (statusFilter === 'type-Random Check' && entryType === 'Random Check') ||
+          (statusFilter.startsWith('cat-') && inspectionCategory === statusFilter.slice(4)) ||
+          (statusFilter === 'defects' && item.defects && item.defects.length > 0) ||
+          (statusFilter === 'photos' && item.photos && item.photos.length > 0) ||
+          (currentStatus === statusFilter);
+
+        if (!matchesQuery || !matchesStatus) return;
+
+        const card = buildInspectionCard(item, idx + 1);
+        if (item.session === 'Morning') {
+          morningList.appendChild(card);
+        } else {
+          afternoonList.appendChild(card);
+        }
+      });
+
+      if (!morningList.children.length) {
+        morningList.innerHTML = `<div class="text-center py-6 bg-white/60 rounded-2xl border border-dashed border-slate-300 text-xs text-slate-400">No matching Morning inspection items</div>`;
+      }
+      if (!afternoonList.children.length) {
+        afternoonList.innerHTML = `<div class="text-center py-6 bg-white/60 rounded-2xl border border-dashed border-slate-300 text-xs text-slate-400">No matching Afternoon inspection items</div>`;
+      }
+    }
+
+    function buildInspectionCard(item, indexNumber) {
+      const card = document.createElement('article');
+      card.className = 'bg-white rounded-2xl shadow-sm border border-slate-200 p-4 space-y-3 transition hover:border-slate-300';
+
+      const defectCount = item.defects ? item.defects.length : 0;
+      const photoCount = item.photos ? item.photos.length : 0;
+      const entryType = inferEntryType(item);
+      const inspectionCategory = inferInspectionCategory(item);
+      const fallbackStatus = entryType === 'Random Check' ? 'OK' : 'Accepted with comments';
+      const itemStatus = item.status || fallbackStatus;
+
+      const typeBadgeClass = entryType === 'Random Check'
+        ? 'bg-indigo-100 text-indigo-800 border-indigo-200'
+        : 'bg-slate-100 text-slate-700 border-slate-200';
+
+      const categoryBadgeClass =
+        inspectionCategory === 'MOS' ? 'bg-purple-100 text-purple-800 border-purple-200' :
+        inspectionCategory === 'NDT' ? 'bg-cyan-100 text-cyan-800 border-cyan-200' :
+        inspectionCategory === 'Rebar Fixing' ? 'bg-sky-100 text-sky-800 border-sky-200' :
+        'bg-slate-100 text-slate-700 border-slate-200';
+
+      const statusBadgeClass =
+        (itemStatus === 'Reinspection required' || itemStatus === 'Not OK') ? 'bg-rose-100 text-rose-800 border-rose-200' :
+        (itemStatus === 'Accepted with minor defects' || itemStatus === 'Not OK and rectified') ? 'bg-amber-100 text-amber-800 border-amber-200' :
+        'bg-emerald-100 text-emerald-800 border-emerald-200';
+
+      // Build Defect Messages HTML
+      let defectsHTML = '';
+      if (defectCount > 0) {
+        defectsHTML = `
+          <div class="space-y-2 pt-2 border-t border-slate-100">
+            <div class="text-[11px] font-bold uppercase tracking-wider text-rose-700 flex items-center gap-1">
+              <span>⚠️ Contractor Defect Messages (${defectCount})</span>
+            </div>
+            ${item.defects.map(def => `
+              <div class="bg-rose-50/80 border border-rose-200 rounded-xl p-2.5 text-xs space-y-1.5">
+                <div class="flex items-start justify-between gap-2">
+                  <p class="text-slate-900 font-medium whitespace-pre-wrap leading-relaxed">${escapeHTML(def.text)}</p>
+                  <button onclick="deleteDefect('${item.id}', '${def.id}')" title="Remove defect message"
+                    class="text-slate-400 hover:text-rose-600 font-bold px-1.5 py-0.5 rounded no-print">✕</button>
+                </div>
+                <div class="flex flex-wrap items-center justify-between gap-2 text-[11px] text-slate-500 pt-1 border-t border-rose-200/60">
+                  <span>To: <strong class="text-slate-700">${escapeHTML(def.recipient || 'Contractor')}</strong> • ${escapeHTML(def.timestamp)}</span>
+                  <select onchange="updateDefectStatus('${item.id}', '${def.id}', this.value)"
+                    class="bg-white border border-rose-200 rounded-lg px-2 py-0.5 font-semibold text-rose-800 focus:outline-none">
+                    <option value="Sent to Contractor" ${def.status === 'Sent to Contractor' ? 'selected' : ''}>Sent to Contractor</option>
+                    <option value="Rectification Pending" ${def.status === 'Rectification Pending' ? 'selected' : ''}>Rectification Pending</option>
+                    <option value="Re-inspected & Closed" ${def.status === 'Re-inspected & Closed' ? 'selected' : ''}>Re-inspected & Closed</option>
+                  </select>
+                </div>
+              </div>
+            `).join('')}
+          </div>
+        `;
+      }
+
+      // Build Attached Photos Strip HTML
+      let photosHTML = '';
+      if (photoCount > 0) {
+        photosHTML = `
+          <div class="pt-2 border-t border-slate-100">
+            <div class="text-[11px] font-bold uppercase tracking-wider text-slate-500 mb-1.5">Site Photos (${photoCount})</div>
+            <div class="flex gap-2 overflow-x-auto no-scrollbar pb-1">
+              ${item.photos.map(photo => `
+                <div onclick="openPhotoViewer('${item.id}', '${photo.id}')" class="relative shrink-0 w-24 h-20 rounded-xl overflow-hidden border border-slate-300 cursor-pointer group shadow-xs">
+                  <img src="${photo.dataUrl}" alt="${escapeHTML(photo.caption || item.title)}" class="w-full h-full object-cover group-hover:scale-105 transition" />
+                  <div class="absolute bottom-0 inset-x-0 bg-slate-950/75 text-white text-[9px] px-1.5 py-0.5 truncate">
+                    ${escapeHTML(photo.caption || photo.timeOnly)}
+                  </div>
+                </div>
+              `).join('')}
+            </div>
+          </div>
+        `;
+      }
+
+      card.innerHTML = `
+        <!-- Card Top Row: Number, Title, Status & Action Icons -->
+        <div class="flex items-start justify-between gap-2">
+          <div class="flex items-start gap-2.5">
+            <span class="mt-0.5 w-6 h-6 rounded-lg bg-slate-900 text-white text-xs font-extrabold flex items-center justify-center shrink-0">
+              ${indexNumber}
+            </span>
+            <div>
+              <div class="flex flex-wrap items-center gap-1.5">
+                <button onclick="toggleEntryType('${item.id}')" title="Tap to switch between Inspection & Random Check"
+                  class="text-[10px] font-extrabold px-2 py-0.5 rounded-md border ${typeBadgeClass} uppercase tracking-wide">
+                  ${escapeHTML(entryType)}
+                </button>
+                <button onclick="cycleInspectionCategory('${item.id}')" title="Tap to cycle Inspection Type (MOS, Rebar Fixing, NDT, etc.)"
+                  class="text-[10px] font-extrabold px-2 py-0.5 rounded-md border ${categoryBadgeClass} uppercase tracking-wide">
+                  ${escapeHTML(inspectionCategory)}
+                </button>
+                <h3 class="text-sm sm:text-base font-bold text-slate-900 leading-snug">${escapeHTML(item.title)}</h3>
+                <button onclick="cycleItemStatus('${item.id}')" title="Tap to cycle result"
+                  class="text-[10px] font-extrabold px-2 py-0.5 rounded-md border ${statusBadgeClass} tracking-wide">
+                  ${escapeHTML(itemStatus)}
+                </button>
+              </div>
+              ${item.notes ? `<p class="text-xs text-slate-600 mt-1 bg-slate-50 px-2.5 py-1.5 rounded-lg border border-slate-100">${escapeHTML(item.notes)}</p>` : ''}
+            </div>
+          </div>
+
+          <div class="flex items-center gap-1 shrink-0 no-print">
+            <button onclick="openCameraModal('${item.id}')" title="Take Photo for this item"
+              class="p-2 rounded-xl bg-amber-50 hover:bg-amber-100 text-amber-700 border border-amber-200 active:scale-95 transition flex items-center gap-1">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" />
+                <path stroke-linecap="round" stroke-linejoin="round" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z" />
+              </svg>
+              ${photoCount > 0 ? `<span class="text-xs font-extrabold">${photoCount}</span>` : ''}
+            </button>
+
+            <button onclick="openQuickDefectModal('${item.id}')" title="Add Defect Message sent to contractor"
+              class="p-2 rounded-xl bg-rose-50 hover:bg-rose-100 text-rose-700 border border-rose-200 active:scale-95 transition flex items-center gap-1">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z" />
+              </svg>
+              ${defectCount > 0 ? `<span class="text-xs font-extrabold">${defectCount}</span>` : ''}
+            </button>
+
+            <button onclick="openEditInspectionModal('${item.id}')" title="Edit or Supplement Notes"
+              class="p-2 rounded-xl bg-slate-50 hover:bg-slate-100 text-slate-600 border border-slate-200 active:scale-95 transition">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+              </svg>
+            </button>
+          </div>
+        </div>
+
+        <!-- Contractor Attendance Pill Toggles -->
+        <div class="flex flex-wrap items-center gap-2 pt-1 border-t border-slate-100">
+          <span class="text-[11px] font-bold uppercase tracking-wider text-slate-400 mr-1">Attendance:</span>
+
+          <button onclick="toggleAttendance('${item.id}', 'aePresent')"
+            class="px-2.5 py-1 rounded-lg text-xs font-bold border transition flex items-center gap-1.5 ${item.aePresent ? 'bg-emerald-50 text-emerald-800 border-emerald-300' : 'bg-slate-50 text-slate-400 border-slate-200'}">
+            <span>${item.aePresent ? '☑' : '☐'}</span>
+            <span>Contractor AE</span>
+          </button>
+
+          <button onclick="toggleAttendance('${item.id}', 'foremanPresent')"
+            class="px-2.5 py-1 rounded-lg text-xs font-bold border transition flex items-center gap-1.5 ${item.foremanPresent ? 'bg-emerald-50 text-emerald-800 border-emerald-300' : 'bg-slate-50 text-slate-400 border-slate-200'}">
+            <span>${item.foremanPresent ? '☑' : '☐'}</span>
+            <span>Contractor Foreman</span>
+          </button>
+
+          ${item.attendeeNote ? `<span class="text-[11px] text-slate-500 italic">(${escapeHTML(item.attendeeNote)})</span>` : ''}
+        </div>
+
+        <!-- Defect Messages Section -->
+        ${defectsHTML}
+
+        <!-- Attached Site Photos -->
+        ${photosHTML}
+      `;
+
+      return card;
+    }
+
+    // =========================================================================
+    // 5. INBUILT LIVE CAMERA & MULTI-PHOTO WATERMARK ENGINE
+    // =========================================================================
+    var mediaStream = null;
+    var currentFacingMode = 'environment';
+    var batchPhotoQueue = []; // Holds multiple watermarked photos ready to attach in one go
+
+    function populateCameraInspectionSelect(preselectId) {
+      const select = document.getElementById('camera-inspection-select');
+      if (appState.inspections.length === 0) {
+        select.innerHTML = `<option value="">-- Add an inspection item first --</option>`;
+        return;
+      }
+      select.innerHTML = appState.inspections.map(item =>
+        `<option value="${item.id}">[${item.session}] ${escapeHTML(item.title)}</option>`
+      ).join('');
+
+      if (preselectId) {
+        select.value = preselectId;
+      }
+      updateCameraLiveOverlay();
+      select.onchange = updateCameraLiveOverlay;
+    }
+
+    function updateCameraLiveOverlay() {
+      const select = document.getElementById('camera-inspection-select');
+      const selectedItem = appState.inspections.find(i => i.id === select.value);
+      document.getElementById('overlay-inspector').textContent =
+        `${appState.meta.inspector} (${appState.meta.role}) | ${appState.meta.date} ${appState.meta.weather} ${appState.meta.temp}`;
+      document.getElementById('overlay-item-label').textContent =
+        selectedItem ? `[${selectedItem.session}] ${selectedItem.title}` : 'Site Inspection';
+    }
+
+    async function openCameraModal(preselectItemId = null) {
+      if (appState.inspections.length === 0) {
+        showToast('Add an inspection entry first before attaching photos', '⚠️');
+        openAddInspectionModal('Afternoon');
+        return;
+      }
+
+      populateCameraInspectionSelect(preselectItemId);
+      document.getElementById('camera-caption-input').value = '';
+      batchPhotoQueue = [];
+      renderBatchQueueUI();
+
+      const modal = document.getElementById('camera-modal');
+      modal.classList.remove('hidden');
+      modal.classList.add('flex');
+
+      resetCameraViewportUI();
+      await startCameraStream();
+    }
+
+    function resetCameraViewportUI() {
+      const video = document.getElementById('camera-video');
+      const canvas = document.getElementById('camera-canvas');
+      const fallback = document.getElementById('camera-fallback-box');
+      const overlay = document.getElementById('camera-live-overlay');
+
+      video.classList.remove('hidden');
+      canvas.classList.add('hidden');
+      fallback.classList.add('hidden');
+      overlay.classList.remove('hidden');
+    }
+
+    async function startCameraStream() {
+      stopCameraStream();
+      const video = document.getElementById('camera-video');
+      const fallback = document.getElementById('camera-fallback-box');
+
+      if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+        fallback.classList.remove('hidden');
+        return;
+      }
+
+      try {
+        mediaStream = await navigator.mediaDevices.getUserMedia({
+          video: {
+            facingMode: { ideal: currentFacingMode },
+            width: { ideal: 1280 },
+            height: { ideal: 960 }
+          },
+          audio: false
+        });
+        video.srcObject = mediaStream;
+        fallback.classList.add('hidden');
+      } catch (err) {
+        console.warn('Camera permission or device fallback triggered:', err);
+        fallback.classList.remove('hidden');
+      }
+    }
+
+    function stopCameraStream() {
+      if (mediaStream) {
+        mediaStream.getTracks().forEach(track => track.stop());
+        mediaStream = null;
+      }
+    }
+
+    async function switchCameraFacing() {
+      currentFacingMode = currentFacingMode === 'environment' ? 'user' : 'environment';
+      await startCameraStream();
+    }
+
+    function capturePhotoToQueue() {
+      const video = document.getElementById('camera-video');
+      if (!video.videoWidth) {
+        showToast('Camera stream not ready—use + Multi-Select if blocked', '⚠️');
+        return;
+      }
+      const watermarkedUrl = generateWatermarkedDataUrl(video, video.videoWidth, video.videoHeight);
+      const nowTime = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+      batchPhotoQueue.push({
+        id: 'q-' + Date.now() + '-' + Math.random().toString(36).slice(2, 6),
+        dataUrl: watermarkedUrl,
+        caption: document.getElementById('camera-caption-input').value.trim(),
+        timeOnly: nowTime
+      });
+      renderBatchQueueUI();
+      showToast(`Photo ${batchPhotoQueue.length} added to queue`);
+    }
+
+    function handleFallbackFiles(event) {
+      const files = Array.from(event.target.files || []);
+      if (!files.length) return;
+
+      let processed = 0;
+      files.forEach((file, idx) => {
+        const reader = new FileReader();
+        reader.onload = function(e) {
+          const img = new Image();
+          img.onload = function() {
+            const watermarkedUrl = generateWatermarkedDataUrl(img, img.width, img.height);
+            const nowTime = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+            batchPhotoQueue.push({
+              id: 'q-' + Date.now() + '-' + idx + '-' + Math.random().toString(36).slice(2, 6),
+              dataUrl: watermarkedUrl,
+              caption: document.getElementById('camera-caption-input').value.trim(),
+              timeOnly: nowTime
+            });
+            processed++;
+            if (processed === files.length) {
+              renderBatchQueueUI();
+              showToast(`Added ${files.length} photo(s) to queue`);
+            }
+          };
+          img.src = e.target.result;
+        };
+        reader.readAsDataURL(file);
+      });
+
+      // Reset file input so user can add even more batches if desired
+      event.target.value = '';
+    }
+
+    function generateWatermarkedDataUrl(sourceElement, srcW, srcH) {
+      const canvas = document.getElementById('camera-canvas');
+
+      // Scale down reasonably to keep storage fast & crisp (max 1024px)
+      const maxDim = 1024;
+      let targetW = srcW;
+      let targetH = srcH;
+      if (targetW > maxDim || targetH > maxDim) {
+        if (targetW > targetH) {
+          targetH = Math.round((targetH * maxDim) / targetW);
+          targetW = maxDim;
+        } else {
+          targetW = Math.round((targetW * maxDim) / targetH);
+          targetH = maxDim;
+        }
+      }
+
+      canvas.width = targetW;
+      canvas.height = targetH;
+      const ctx = canvas.getContext('2d');
+
+      // Draw captured frame
+      ctx.drawImage(sourceElement, 0, 0, targetW, targetH);
+
+      // Draw construction site watermark banner at the bottom
+      const select = document.getElementById('camera-inspection-select');
+      const selectedItem = appState.inspections.find(i => i.id === select.value);
+      const caption = document.getElementById('camera-caption-input').value.trim();
+      const nowTime = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+
+      const bannerHeight = Math.max(68, Math.round(targetH * 0.12));
+      ctx.fillStyle = 'rgba(15, 23, 42, 0.82)';
+      ctx.fillRect(0, targetH - bannerHeight, targetW, bannerHeight);
+
+      // Amber accent stripe
+      ctx.fillStyle = '#f59e0b';
+      ctx.fillRect(0, targetH - bannerHeight, 8, bannerHeight);
+
+      const fontSizePrimary = Math.max(14, Math.round(targetW * 0.022));
+      const fontSizeSecondary = Math.max(12, Math.round(targetW * 0.018));
+
+      ctx.fillStyle = '#fbbf24';
+      ctx.font = `bold ${fontSizePrimary}px "JetBrains Mono", monospace`;
+      ctx.fillText(
+        `${appState.meta.inspector} (${appState.meta.role}) | ${appState.meta.date} ${nowTime} | ${appState.meta.weather} ${appState.meta.temp}`,
+        20,
+        targetH - bannerHeight + Math.round(bannerHeight * 0.42)
+      );
+
+      ctx.fillStyle = '#f8fafc';
+      ctx.font = `600 ${fontSizeSecondary}px "Inter", sans-serif`;
+      const itemLabel = selectedItem ? `[${selectedItem.session}] ${selectedItem.title}` : 'Site Inspection';
+      const fullLine2 = caption ? `${itemLabel} — ${caption}` : itemLabel;
+      ctx.fillText(fullLine2, 20, targetH - bannerHeight + Math.round(bannerHeight * 0.80));
+
+      return canvas.toDataURL('image/jpeg', 0.86);
+    }
+
+    function renderBatchQueueUI() {
+      const bar = document.getElementById('batch-queue-bar');
+      const thumbs = document.getElementById('batch-queue-thumbs');
+      const countEl = document.getElementById('batch-queue-count');
+      const attachBtn = document.getElementById('attach-queue-btn');
+      const attachBtnCount = document.getElementById('attach-queue-btn-count');
+
+      if (batchPhotoQueue.length === 0) {
+        bar.classList.add('hidden');
+        attachBtn.classList.add('hidden');
+        return;
+      }
+
+      bar.classList.remove('hidden');
+      attachBtn.classList.remove('hidden');
+      countEl.textContent = batchPhotoQueue.length;
+      attachBtnCount.textContent = batchPhotoQueue.length;
+
+      thumbs.innerHTML = batchPhotoQueue.map((p, i) => `
+        <div class="relative shrink-0 w-16 h-14 rounded-lg overflow-hidden border border-amber-400/70">
+          <img src="${p.dataUrl}" class="w-full h-full object-cover" />
+          <button type="button" onclick="removeQueuedPhoto(${i})"
+            class="absolute top-0.5 right-0.5 w-5 h-5 rounded-full bg-slate-950/85 text-white text-[10px] font-bold flex items-center justify-center">✕</button>
+        </div>
+      `).join('');
+    }
+
+    function removeQueuedPhoto(index) {
+      batchPhotoQueue.splice(index, 1);
+      renderBatchQueueUI();
+    }
+
+    function clearBatchQueue() {
+      batchPhotoQueue = [];
+      renderBatchQueueUI();
+    }
+
+    async function commitBatchPhotos() {
+      const select = document.getElementById('camera-inspection-select');
+      const targetItem = appState.inspections.find(i => i.id === select.value);
+      if (!targetItem) {
+        showToast('Select an inspection item first', '⚠️');
+        return;
+      }
+      if (batchPhotoQueue.length === 0) {
+        showToast('Snap or select at least one photo first', '⚠️');
+        return;
+      }
+
+      if (!targetItem.photos) targetItem.photos = [];
+      const captionOverride = document.getElementById('camera-caption-input').value.trim();
+
+      batchPhotoQueue.forEach((p, idx) => {
+        targetItem.photos.push({
+          id: 'photo-' + Date.now() + '-' + idx,
+          dataUrl: p.dataUrl,
+          caption: captionOverride || p.caption || '',
+          timeOnly: p.timeOnly,
+          timestamp: `${appState.meta.date} ${p.timeOnly}`
+        });
+      });
+
+      const attachedCount = batchPhotoQueue.length;
+      batchPhotoQueue = [];
+      await saveState(false);
+      renderInspections();
+      closeCameraModal();
+      showToast(`Attached ${attachedCount} watermarked photo(s) to ${targetItem.title}`);
+    }
+
+    function closeCameraModal() {
+      stopCameraStream();
+      const modal = document.getElementById('camera-modal');
+      modal.classList.add('hidden');
+      modal.classList.remove('flex');
+    }
+
+    // =========================================================================
+    // 6. PHOTO VIEWER, EXPORT REPORT, RESET & PHONE FILE BACKUP MODALS
+    // =========================================================================
+    var viewingPhotoRef = null;
+
+    function openPhotoViewer(itemId, photoId) {
+      const item = appState.inspections.find(i => i.id === itemId);
+      if (!item || !item.photos) return;
+      const photo = item.photos.find(p => p.id === photoId);
+      if (!photo) return;
+
+      viewingPhotoRef = { itemId, photoId };
+      document.getElementById('viewer-title').textContent = `[${item.session}] ${item.title}`;
+      document.getElementById('viewer-img').src = photo.dataUrl;
+      document.getElementById('viewer-meta').textContent = `${photo.caption || 'Site Photo'} • ${photo.timestamp || appState.meta.date}`;
+
+      const delBtn = document.getElementById('viewer-delete-btn');
+      delBtn.onclick = async function() {
+        item.photos = item.photos.filter(p => p.id !== photoId);
+        await saveState(false);
+        renderInspections();
+        closePhotoViewer();
+        showToast('Photo deleted');
+      };
+
+      const modal = document.getElementById('photo-viewer-modal');
+      modal.classList.remove('hidden');
+      modal.classList.add('flex');
+    }
+
+    function closePhotoViewer() {
+      const modal = document.getElementById('photo-viewer-modal');
+      modal.classList.add('hidden');
+      modal.classList.remove('flex');
+      viewingPhotoRef = null;
+    }
+
+    function openExportModal() {
+      const lines = [];
+      lines.push(`${appState.meta.inspector} (${appState.meta.role})`);
+      lines.push(`Date: ${appState.meta.date} | Weather: ${appState.meta.weather} (${appState.meta.temp})`);
+      lines.push('==================================================');
+
+      ['Morning', 'Afternoon'].forEach(sessionName => {
+        const items = appState.inspections.filter(i => i.session === sessionName);
+        lines.push(`\n${sessionName.toUpperCase()}:`);
+        if (items.length === 0) {
+          lines.push('  (No entries logged)');
+        }
+        items.forEach((item, idx) => {
+          const attParts = [];
+          if (item.aePresent) attParts.push('Contractor AE');
+          if (item.foremanPresent) attParts.push('Contractor Foreman');
+          const attText = attParts.length > 0
+            ? `[Present: ${attParts.join(' & ')}${item.attendeeNote ? ' - ' + item.attendeeNote : ''}]`
+            : '[Attendance: None recorded]';
+
+          lines.push(`${idx + 1}. [${inferEntryType(item)} | ${inferInspectionCategory(item)}] ${item.title} — (${item.status || (inferEntryType(item) === 'Random Check' ? 'OK' : 'Accepted with comments')})`);
+          lines.push(`   ${attText}`);
+          if (item.notes) {
+            lines.push(`   Remarks: ${item.notes}`);
+          }
+          if (item.defects && item.defects.length > 0) {
+            item.defects.forEach(d => {
+              lines.push(`   Defect Msg (${d.status}): ${d.text}`);
+            });
+          }
+          if (item.photos && item.photos.length > 0) {
+            lines.push(`   Attached Photos: ${item.photos.length} photo(s)`);
+          }
+        });
+      });
+
+      if (appState.meta.generalNotes) {
+        lines.push('\nGENERAL SITE REMARKS / WEATHER:');
+        lines.push(appState.meta.generalNotes);
+      }
+
+      document.getElementById('export-preview-text').value = lines.join('\n');
+      buildA4PrintReport();
+      const modal = document.getElementById('export-modal');
+      modal.classList.remove('hidden');
+      modal.classList.add('flex');
+    }
+
+    function closeExportModal() {
+      const modal = document.getElementById('export-modal');
+      modal.classList.add('hidden');
+      modal.classList.remove('flex');
+    }
+
+    function buildA4PrintReport() {
+      const report = document.getElementById('a4-print-report');
+      if (!report) return;
+      const esc = escapeHTML;
+      const projectName = (appState.meta && appState.meta.project) || 'New Central Harbourfront Site 3';
+
+      const getTimes = item => {
+        if (item.startTime || item.endTime) return item.startTime && item.endTime ? `${item.startTime}-${item.endTime}` : (item.startTime || item.endTime);
+        const values = [];
+        (item.photos || []).forEach(p => { if (p.timeOnly) values.push(p.timeOnly); });
+        (item.defects || []).forEach(d => {
+          const m = String(d.timestamp || '').match(/(\\d{1,2}:\\d{2})/);
+          if (m) values.push(m[1]);
+        });
+        if (!values.length) return item.session || '';
+        values.sort();
+        return values.length > 1 ? `${values[0]}-${values[values.length - 1]}` : values[0];
+      };
+
+      const rows = appState.inspections.map((item, idx) => {
+        const participants = [
+          item.aePresent ? 'Contractor AE' : '',
+          item.foremanPresent ? 'Contractor Foreman' : '',
+          item.attendeeNote || ''
+        ].filter(Boolean).join('; ') || 'Not recorded';
+        const defects = (item.defects || []).map(d =>
+          `<div class="nonconformity">Non-conformity / comment (${esc(d.status || 'Recorded')}): ${esc(d.text || '')}</div>`
+        ).join('');
+        const result = item.status || (inferEntryType(item) === 'Random Check' ? 'OK' : 'Accepted with comments');
+        return `<tr>
+          <td class="col-no">${idx + 1}</td>
+          <td class="col-time">${esc(getTimes(item))}</td>
+          <td class="col-activity"><div class="entry-type">${esc(inferEntryType(item))} - ${esc(inferInspectionCategory(item))}</div><div class="entry-details">${esc(item.title || '')}</div></td>
+          <td class="col-participants">${esc(participants)}</td>
+          <td class="col-result"><strong>${esc(result)}</strong>${item.notes ? `<div class="entry-details">${esc(item.notes)}</div>` : ''}${defects}</td>
+        </tr>`;
+      }).join('') || '<tr><td colspan="5" style="height:25mm;text-align:center">No activities recorded.</td></tr>';
+
+      const photoCards = [];
+      appState.inspections.forEach((item, itemIndex) => {
+        (item.photos || []).forEach((p, photoIndex) => {
+          photoCards.push(`<div class="logbook-photo-card"><img class="logbook-photo" src="${p.dataUrl}" alt="Site record photo"><div class="photo-caption"><strong>Activity ${itemIndex + 1}, Photo ${photoIndex + 1}:</strong> ${esc(p.caption || item.title || 'Site record')} ${p.timeOnly ? `(${esc(p.timeOnly)})` : ''}</div></div>`);
+        });
+      });
+
+      report.innerHTML = `
+        <div class="logbook-heading">PERSONAL LOGBOOK (SITE DIARY)</div>
+        <table class="logbook-front">
+          <tr><td class="label">Project</td><td colspan="3">${esc(projectName)}</td></tr>
+          <tr><td class="label">Name</td><td>${esc(appState.meta.inspector || '')}</td><td class="label">Post</td><td>${esc(appState.meta.role || '')}</td></tr>
+          <tr><td class="label">Signature</td><td class="signature-space" colspan="3"></td></tr>
+        </table>
+
+        <div class="daily-title">Daily Record</div>
+        <table class="daily-info">
+          <tr><th>Date</th><td>${esc(appState.meta.date || '')}</td><th>Weather</th><td>${esc(appState.meta.weather || '')}</td><th>Ambient temperature</th><td>${esc(appState.meta.temp || '')}</td></tr>
+        </table>
+
+        <table class="logbook-table">
+          <thead><tr><th class="col-no">No.</th><th class="col-time">Time started / completed</th><th class="col-activity">Activity and location</th><th class="col-participants">Participants on site</th><th class="col-result">Inspection result, comments and non-conformities</th></tr></thead>
+          <tbody>${rows}</tbody>
+        </table>
+
+        ${appState.meta.generalNotes ? `<div class="meeting-note"><strong>Site meetings / important instant messages / verbal instructions / general remarks</strong><div style="margin-top:1.5mm">${esc(appState.meta.generalNotes)}</div></div>` : ''}
+        <div class="footer-note">Entries are presented in the chronological order recorded in the site diary.</div>
+        ${photoCards.length ? `<section class="photo-section"><div class="photo-title">Photographic Records</div><div class="logbook-photo-grid">${photoCards.join('')}</div></section>` : ''}
+      `;
+    }
+    function printA4Diary() {
+      buildA4PrintReport();
+      document.title = `Site_Diary_${dateStrToISO(appState.dateKey)}_A4_Duplex`;
+      setTimeout(() => window.print(), 100);
+    }
+    
+    function copyExportText() {
+      const textarea = document.getElementById('export-preview-text');
+      textarea.select();
+      textarea.setSelectionRange(0, 99999);
+      document.execCommand('copy');
+      showToast('Site Diary copied to clipboard');
+    }
+
+    function openResetConfirm() {
+      document.getElementById('reset-date-label').textContent = appState.dateKey;
+      const modal = document.getElementById('reset-modal');
+      modal.classList.remove('hidden');
+      modal.classList.add('flex');
+    }
+
+    function closeResetModal() {
+      const modal = document.getElementById('reset-modal');
+      modal.classList.add('hidden');
+      modal.classList.remove('flex');
+    }
+
+    async function confirmResetDay() {
+      const fresh = buildDefaultDiaryForDate(appState.dateKey, appState && appState.meta ? appState.meta : null);
+      appState = fresh;
+      await saveState(false);
+      initUI();
+      closeResetModal();
+      showToast(`Reset ${appState.dateKey} to default`);
+    }
+
+    var customFileHandle = null;
+    var customFolderHandle = null;
+
+    async function chooseCustomLocalSaveLocation() {
+      const fileDate = dateStrToISO(appState.dateKey);
+      const defaultFileName = `QCS_Site_Diary_${fileDate}.json`;
+      diaryCache = await dbGetAllDiaries();
+      const payloadStr = JSON.stringify({
+        app: 'QCS Site Inspection Diary',
+        exportedAt: new Date().toISOString(),
+        diaries: diaryCache
+      }, null, 2);
+
+      // 1. Desktop / Android Chrome File System Access API (Choose exact local file path)
+      if (window.showSaveFilePicker) {
+        try {
+          customFileHandle = await window.showSaveFilePicker({
+            suggestedName: defaultFileName,
+            types: [{
+              description: 'QCS Site Diary JSON File',
+              accept: { 'application/json': ['.json'] }
+            }]
+          });
+          await writePayloadToCustomHandle(payloadStr);
+          updateChosenLocationUI(`Linked File: ${customFileHandle.name} (Auto-syncing on save)`);
+          showToast(`Saved & linked to ${customFileHandle.name}`);
+          return;
+        } catch (err) {
+          if (err.name === 'AbortError') return;
+        }
+      }
+
+      // 2. Directory Picker fallback if available
+      if (window.showDirectoryPicker) {
+        try {
+          customFolderHandle = await window.showDirectoryPicker({ mode: 'readwrite' });
+          customFileHandle = await customFolderHandle.getFileHandle(defaultFileName, { create: true });
+          await writePayloadToCustomHandle(payloadStr);
+          updateChosenLocationUI(`Linked Folder: ${customFolderHandle.name}/${defaultFileName}`);
+          showToast(`Linked folder: ${customFolderHandle.name}`);
+          return;
+        } catch (err) {
+          if (err.name === 'AbortError') return;
+        }
+      }
+
+      // 3. iOS Safari / Mobile Web Share Sheet ("Save to Files" -> choose any folder on iPhone/iCloud/Drive)
+      const blob = new Blob([payloadStr], { type: 'application/json' });
+      const fileObj = new File([blob], defaultFileName, { type: 'application/json' });
+      if (navigator.canShare && navigator.canShare({ files: [fileObj] })) {
+        try {
+          await navigator.share({
+            files: [fileObj],
+            title: 'Save QCS Site Diary to Folder',
+            text: `Site Diary backup (${appState.dateKey})`
+          });
+          updateChosenLocationUI(`Saved via Phone Files Picker (${defaultFileName})`);
+          showToast('Saved to your chosen phone folder');
+          return;
+        } catch (err) {
+          if (err.name === 'AbortError') return;
+        }
+      }
+
+      // 4. Direct browser download fallback
+      downloadFullBackupJSON();
+      updateChosenLocationUI(`Downloaded ${defaultFileName} to Phone Downloads folder`);
+    }
+
+    async function writePayloadToCustomHandle(payloadStr) {
+      if (!customFileHandle) return;
+      const writable = await customFileHandle.createWritable();
+      await writable.write(payloadStr);
+      await writable.close();
+    }
+
+    async function syncNowToChosenLocation() {
+      if (!customFileHandle) {
+        await chooseCustomLocalSaveLocation();
+        return;
+      }
+      try {
+        diaryCache = await dbGetAllDiaries();
+        const payloadStr = JSON.stringify({
+          app: 'QCS Site Inspection Diary',
+          exportedAt: new Date().toISOString(),
+          diaries: diaryCache
+        }, null, 2);
+        await writePayloadToCustomHandle(payloadStr);
+        showToast(`Synced latest changes to ${customFileHandle.name}`);
+      } catch (err) {
+        showToast('Re-select folder to grant write permission', '⚠️');
+      }
+    }
+
+    function updateChosenLocationUI(text) {
+      const label = document.getElementById('linked-location-text');
+      const badge = document.getElementById('linked-folder-badge');
+      const syncBtn = document.getElementById('sync-linked-now-btn');
+      const headerStatus = document.getElementById('storage-status-label');
+
+      if (label) label.textContent = text;
+      if (badge) badge.textContent = 'Custom Location Set';
+      if (syncBtn && customFileHandle) syncBtn.classList.remove('hidden');
+      if (headerStatus) headerStatus.textContent = text.slice(0, 34);
+    }
+
+    function openBackupModal() {
+      const originLabel = document.getElementById('storage-origin-label');
+      if (originLabel) {
+        originLabel.textContent = window.location.origin && window.location.origin !== 'null'
+          ? `${window.location.origin} (IndexedDB)`
+          : 'Local App Sandbox (IndexedDB)';
+      }
+      const modal = document.getElementById('backup-modal');
+      modal.classList.remove('hidden');
+      modal.classList.add('flex');
+    }
+
+    function closeBackupModal() {
+      const modal = document.getElementById('backup-modal');
+      modal.classList.add('hidden');
+      modal.classList.remove('flex');
+    }
+
+    async function downloadFullBackupJSON() {
+      diaryCache = await dbGetAllDiaries();
+      const payload = {
+        app: 'QCS Site Inspection Diary',
+        exportedAt: new Date().toISOString(),
+        diaries: diaryCache
+      };
+      const blob = new Blob([JSON.stringify(payload, null, 2)], { type: 'application/json' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      const fileDate = dateStrToISO(appState.dateKey);
+      a.href = url;
+      a.download = `QCS_Site_Diary_Backup_${fileDate}.json`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+      showToast('Backup file saved to your phone Downloads folder');
+    }
+
+    async function restoreFullBackupJSON(event) {
+      const file = event.target.files && event.target.files[0];
+      if (!file) return;
+      try {
+        let text = await file.text();
+        // Accept UTF-8 BOM and harmless leading/trailing whitespace from older backups.
+        text = text.replace(/^\uFEFF/, '').trim();
+        const parsed = JSON.parse(text);
+
+        // Backward-compatible extraction. Older versions may contain:
+        // 1) { diaries: [...] }
+        // 2) a single diary { meta, inspections, ... }
+        // 3) a raw array of diaries
+        // 4) { data: { diaries:[...] } } / { backup:{ diaries:[...] } }
+        let list = [];
+        if (Array.isArray(parsed)) list = parsed;
+        else if (parsed && Array.isArray(parsed.diaries)) list = parsed.diaries;
+        else if (parsed && parsed.meta) list = [parsed];
+        else if (parsed && parsed.data && Array.isArray(parsed.data.diaries)) list = parsed.data.diaries;
+        else if (parsed && parsed.backup && Array.isArray(parsed.backup.diaries)) list = parsed.backup.diaries;
+
+        // Also accept object maps keyed by DD/MM/YYYY or YYYY-MM-DD.
+        if (!list.length && parsed && typeof parsed === 'object') {
+          list = Object.values(parsed).filter(v => v && typeof v === 'object' && (v.meta || v.dateKey || v.inspections));
+        }
+        if (!list.length) throw new Error('No diary records found in backup');
+
+        const restored = [];
+        for (const raw of list) {
+          if (!raw || typeof raw !== 'object') continue;
+          const d = (typeof structuredClone === 'function') ? structuredClone(raw) : JSON.parse(JSON.stringify(raw));
+          d.meta = d.meta || {};
+          const candidateDate = d.dateKey || d.meta.date || d.date || d.day;
+          if (!candidateDate) continue;
+          d.dateKey = normalizeDateKey(candidateDate);
+          d.meta.date = d.dateKey;
+          d.meta.inspector = d.meta.inspector || 'Chan Wing Yiu';
+          d.meta.role = d.meta.role || 'QCS';
+          d.meta.weather = d.meta.weather || '';
+          d.meta.temp = d.meta.temp || '';
+          d.meta.generalNotes = d.meta.generalNotes || '';
+          d.inspections = Array.isArray(d.inspections) ? d.inspections : (Array.isArray(d.items) ? d.items : []);
+          d.inspections = d.inspections.map(item => ({
+            ...item,
+            defects: Array.isArray(item.defects) ? item.defects : [],
+            photos: Array.isArray(item.photos) ? item.photos : []
+          }));
+          d.updatedAt = d.updatedAt || Date.now();
+          await dbPutDiary(d);
+          restored.push(d);
+        }
+        if (!restored.length) throw new Error('Backup contained no usable diary dates');
+
+        const restoredDiariesNow = await dbGetAllDiaries();
+        diaryCache = restoredDiariesNow;
+        const todayKey = getTodayDateKey();
+        const restoredActiveDiary = restored.find(d => d.dateKey === todayKey) || restored[restored.length - 1];
+        appState = restoredActiveDiary;
+        localStorage.setItem(ACTIVE_DATE_KEY, restoredActiveDiary.dateKey);
+        initUI();
+        closeBackupModal();
+        showToast(`Restored ${restored.length} day(s) from backup`);
+      } catch (err) {
+        console.error('Backup restore failed:', err);
+        showToast(`Backup could not be restored: ${err.message || 'unsupported JSON format'}`, '⚠️');
+      } finally {
+        event.target.value = '';
+      }
+    }
+
+    // =========================================================================
+    // 8. INSPECTION ITEM, ATTENDANCE & DEFECT MANAGEMENT FUNCTIONS
+    // =========================================================================
+    function openAddInspectionModal(defaultSession = 'Afternoon') {
+      document.getElementById('item-modal-title').textContent = 'Add New Entry';
+      document.getElementById('edit-item-id').value = '';
+      document.getElementById('item-session-select').value = defaultSession;
+      document.getElementById('item-start-time').value = '';
+      document.getElementById('item-end-time').value = '';
+      document.getElementById('item-type-select').value = 'Inspection';
+      document.getElementById('item-category-select').value = 'Rebar Fixing';
+      syncStatusOptionsForType('modal', 'Accepted with comments');
+      document.getElementById('item-title-input').value = '';
+      document.getElementById('item-notes-input').value = '';
+      document.getElementById('item-ae-check').checked = true;
+      document.getElementById('item-foreman-check').checked = true;
+      document.getElementById('item-attendee-note').value = '';
+      document.getElementById('delete-item-btn').classList.add('hidden');
+
+      const modal = document.getElementById('item-modal');
+      modal.classList.remove('hidden');
+      modal.classList.add('flex');
+    }
+
+    function openEditInspectionModal(itemId) {
+      const item = appState.inspections.find(i => i.id === itemId);
+      if (!item) return;
+
+      const entryType = inferEntryType(item);
+      const inspectionCategory = inferInspectionCategory(item);
+      const defaultStatus = entryType === 'Random Check' ? 'OK' : 'Accepted with comments';
+
+      document.getElementById('item-modal-title').textContent = 'Edit Entry';
+      document.getElementById('edit-item-id').value = item.id;
+      document.getElementById('item-session-select').value = item.session || 'Afternoon';
+      document.getElementById('item-start-time').value = item.startTime || '';
+      document.getElementById('item-end-time').value = item.endTime || '';
+      document.getElementById('item-type-select').value = entryType;
+      document.getElementById('item-category-select').value = inspectionCategory;
+      syncStatusOptionsForType('modal', item.status || defaultStatus);
+      document.getElementById('item-title-input').value = item.title || '';
+      document.getElementById('item-notes-input').value = item.notes || '';
+      document.getElementById('item-ae-check').checked = item.aePresent !== false;
+      document.getElementById('item-foreman-check').checked = item.foremanPresent !== false;
+      document.getElementById('item-attendee-note').value = item.attendeeNote || '';
+      document.getElementById('delete-item-btn').classList.remove('hidden');
+
+      const modal = document.getElementById('item-modal');
+      modal.classList.remove('hidden');
+      modal.classList.add('flex');
+    }
+
+    function useCurrentTime(inputId) {
+      const now = new Date();
+      const hh = String(now.getHours()).padStart(2, '0');
+      const mm = String(now.getMinutes()).padStart(2, '0');
+      const input = document.getElementById(inputId);
+      if (input) {
+        input.value = `${hh}:${mm}`;
+        input.dispatchEvent(new Event('change', { bubbles: true }));
+      }
+    }
+
+    function closeItemModal() {
+      const modal = document.getElementById('item-modal');
+      modal.classList.add('hidden');
+      modal.classList.remove('flex');
+    }
+
+    async function saveInspectionItem(openCameraAfter = false) {
+      const editId = document.getElementById('edit-item-id').value;
+      const session = document.getElementById('item-session-select').value;
+      const startTime = document.getElementById('item-start-time').value;
+      const endTime = document.getElementById('item-end-time').value;
+      const entryType = document.getElementById('item-type-select').value;
+      const inspectionCategory = document.getElementById('item-category-select').value;
+      const status = document.getElementById('item-status-select').value;
+      const title = document.getElementById('item-title-input').value.trim();
+      const notes = document.getElementById('item-notes-input').value.trim();
+      const aePresent = document.getElementById('item-ae-check').checked;
+      const foremanPresent = document.getElementById('item-foreman-check').checked;
+      const attendeeNote = document.getElementById('item-attendee-note').value.trim();
+
+      if (!title) {
+        showToast('Please enter location or activity', '⚠️');
+        return;
+      }
+
+      let savedId = '';
+      if (editId) {
+        const item = appState.inspections.find(i => i.id === editId);
+        if (item) {
+          item.session = session;
+          item.startTime = startTime;
+          item.endTime = endTime;
+          item.entryType = entryType;
+          item.inspectionCategory = inspectionCategory;
+          item.status = status;
+          item.title = title;
+          item.notes = notes;
+          item.aePresent = aePresent;
+          item.foremanPresent = foremanPresent;
+          item.attendeeNote = attendeeNote;
+          savedId = item.id;
+        }
+      } else {
+        const newItem = {
+          id: 'insp-' + Date.now(),
+          session,
+          startTime,
+          endTime,
+          entryType,
+          inspectionCategory,
+          status,
+          title,
+          notes,
+          aePresent,
+          foremanPresent,
+          attendeeNote,
+          defects: [],
+          photos: []
+        };
+        appState.inspections.push(newItem);
+        savedId = newItem.id;
+      }
+
+      await saveState(false);
+      renderInspections();
+      closeItemModal();
+      showToast(`${inspectionCategory} (${entryType}) saved`);
+
+      if (openCameraAfter && savedId) {
+        openCameraModal(savedId);
+      }
+    }
+
+    async function deleteCurrentItem() {
+      const editId = document.getElementById('edit-item-id').value;
+      if (!editId) return;
+      appState.inspections = appState.inspections.filter(i => i.id !== editId);
+      await saveState(false);
+      renderInspections();
+      closeItemModal();
+      showToast('Entry deleted');
+    }
+
+    async function toggleEntryType(itemId) {
+      const item = appState.inspections.find(i => i.id === itemId);
+      if (!item) return;
+      const currentType = inferEntryType(item);
+      const nextType = currentType === 'Inspection' ? 'Random Check' : 'Inspection';
+      item.entryType = nextType;
+      item.status = nextType === 'Random Check' ? 'OK' : 'Accepted with comments';
+      await saveState(false);
+      renderInspections();
+      showToast(`Switched to ${nextType} (${item.status})`);
+    }
+
+    async function cycleInspectionCategory(itemId) {
+      const item = appState.inspections.find(i => i.id === itemId);
+      if (!item) return;
+      const currentCategory = inferInspectionCategory(item);
+      const currentIndex = INSPECTION_CATEGORIES.indexOf(currentCategory);
+      const nextCategory = INSPECTION_CATEGORIES[(currentIndex + 1) % INSPECTION_CATEGORIES.length];
+      item.inspectionCategory = nextCategory;
+      await saveState(false);
+      renderInspections();
+      showToast(`Inspection Type: ${nextCategory}`);
+    }
+
+    async function toggleAttendance(itemId, field) {
+      const item = appState.inspections.find(i => i.id === itemId);
+      if (!item) return;
+      item[field] = !item[field];
+      await saveState(false);
+      renderInspections();
+    }
+
+    async function markAllAttendance() {
+      appState.inspections.forEach(i => {
+        i.aePresent = true;
+        i.foremanPresent = true;
+      });
+      await saveState(false);
+      renderInspections();
+      showToast('All items marked with AE & Foreman present');
+    }
+
+    function openQuickDefectModal(preselectItemId = null) {
+      const select = document.getElementById('defect-inspection-select');
+      select.innerHTML = appState.inspections.map(i => `<option value="${i.id}">[${i.session}] ${escapeHTML(i.title)}</option>`).join('');
+      if (preselectItemId) select.value = preselectItemId;
+
+      document.getElementById('defect-text-input').value = '';
+      document.getElementById('defect-recipient-input').value = 'Contractor AE & Foreman (WhatsApp)';
+      document.getElementById('defect-status-select').value = 'Sent to Contractor';
+
+      const modal = document.getElementById('defect-modal');
+      modal.classList.remove('hidden');
+      modal.classList.add('flex');
+    }
+
+    function closeDefectModal() {
+      const modal = document.getElementById('defect-modal');
+      modal.classList.add('hidden');
+      modal.classList.remove('flex');
+    }
+
+    async function saveDefectMessage() {
+      const itemId = document.getElementById('defect-inspection-select').value;
+      const text = document.getElementById('defect-text-input').value.trim();
+      const recipient = document.getElementById('defect-recipient-input').value.trim();
+      const status = document.getElementById('defect-status-select').value;
+
+      if (!text) {
+        showToast('Please enter defect message', '⚠️');
+        return;
+      }
+      const item = appState.inspections.find(i => i.id === itemId);
+      if (!item) return;
+
+      if (!item.defects) item.defects = [];
+      const timeStr = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+      item.defects.push({
+        id: 'def-' + Date.now(),
+        text,
+        recipient,
+        status,
+        timestamp: `${appState.meta.date} ${timeStr}`
+      });
+
+      // Automatically tag inspection as Accepted with minor defects if currently accepted with comments
+      if (!item.status || item.status === 'Accepted with comments') {
+        item.status = 'Accepted with minor defects';
+      }
+
+      await saveState(false);
+      renderInspections();
+      closeDefectModal();
+      showToast('Defect message logged');
+    }
+
+    async function deleteDefect(itemId, defectId) {
+      const item = appState.inspections.find(i => i.id === itemId);
+      if (!item || !item.defects) return;
+      item.defects = item.defects.filter(d => d.id !== defectId);
+      await saveState(false);
+      renderInspections();
+      showToast('Defect message removed');
+    }
+
+    async function updateDefectStatus(itemId, defectId, newStatus) {
+      const item = appState.inspections.find(i => i.id === itemId);
+      if (!item || !item.defects) return;
+      const defect = item.defects.find(d => d.id === defectId);
+      if (defect) {
+        defect.status = newStatus;
+        await saveState(false);
+        renderInspections();
+        showToast(`Defect status: ${newStatus}`);
+      }
+    }
+
+    async function cycleItemStatus(itemId) {
+      const item = appState.inspections.find(i => i.id === itemId);
+      if (!item) return;
+      const entryType = inferEntryType(item);
+      const statuses = entryType === 'Random Check'
+        ? ['OK', 'Not OK and rectified', 'Not OK']
+        : ['Accepted with comments', 'Accepted with minor defects', 'Reinspection required'];
+      const currentStatus = item.status || statuses[0];
+      const nextIndex = (statuses.indexOf(currentStatus) + 1) % statuses.length;
+      item.status = statuses[nextIndex];
+      await saveState(false);
+      renderInspections();
+      showToast(`Result: ${item.status}`);
+    }
+
+    function applyQuickChip(chipText, forcedType = null, forcedCategory = null) {
+      const input = document.getElementById('quick-title-input');
+      input.value = chipText;
+      if (forcedType) {
+        document.getElementById('quick-type').value = forcedType;
+        syncStatusOptionsForType('quick');
+      }
+      if (forcedCategory) {
+        document.getElementById('quick-category').value = forcedCategory;
+      }
+      input.focus();
+    }
+
+    function fillModalChip(chipText, forcedType = null, forcedCategory = null) {
+      const input = document.getElementById('item-title-input');
+      input.value = chipText;
+      if (forcedType) {
+        document.getElementById('item-type-select').value = forcedType;
+        syncStatusOptionsForType('modal');
+      }
+      if (forcedCategory) {
+        document.getElementById('item-category-select').value = forcedCategory;
+      }
+      input.focus();
+    }
+
+    async function handleQuickAdd(openCameraAfter = false) {
+      const input = document.getElementById('quick-title-input');
+      const title = input.value.trim();
+      if (!title) {
+        showToast('Type a location or activity first', '⚠️');
+        input.focus();
+        return;
+      }
+
+      const session = document.getElementById('quick-session').value;
+      const entryType = document.getElementById('quick-type').value;
+      const inspectionCategory = document.getElementById('quick-category').value;
+      const status = document.getElementById('quick-status').value;
+
+      const newItem = {
+        id: 'insp-' + Date.now(),
+        session,
+        entryType,
+        inspectionCategory,
+        status,
+        title,
+        notes: '',
+        aePresent: true,
+        foremanPresent: true,
+        attendeeNote: '',
+        defects: [],
+        photos: []
+      };
+
+      appState.inspections.push(newItem);
+      input.value = '';
+      await saveState(false);
+      renderInspections();
+      showToast(`Added [${inspectionCategory} • ${entryType}] ${title}`);
+
+      if (openCameraAfter) {
+        openCameraModal(newItem.id);
+      }
+    }
+
+    // =========================================================================
+    // 9. SELECT & IMPORT PREVIOUS ENTRIES FROM SAVED DAYS
+    // =========================================================================
+    async function openPreviousEntriesModal() {
+      diaryCache = await dbGetAllDiaries();
+      document.getElementById('prev-target-date-label').textContent = appState.dateKey;
+
+      const select = document.getElementById('prev-source-date-select');
+      const sorted = [...diaryCache].sort((a, b) =>
+        dateStrToISO(b.dateKey).localeCompare(dateStrToISO(a.dateKey))
+      );
+
+      // Prefer another day by default if available, otherwise current day
+      const otherDay = sorted.find(d => d.dateKey !== appState.dateKey);
+      select.innerHTML = sorted.map(d => {
+        const count = d.inspections ? d.inspections.length : 0;
+        const labelSuffix = d.dateKey === appState.dateKey ? ' (Current Day)' : '';
+        return `<option value="${d.dateKey}">${escapeHTML(d.dateKey)}${labelSuffix} — ${count} entries</option>`;
+      }).join('');
+
+      if (otherDay) {
+        select.value = otherDay.dateKey;
+      }
+
+      renderPreviousEntriesList();
+      const modal = document.getElementById('prev-entries-modal');
+      modal.classList.remove('hidden');
+      modal.classList.add('flex');
+    }
+
+    function closePreviousEntriesModal() {
+      const modal = document.getElementById('prev-entries-modal');
+      modal.classList.add('hidden');
+      modal.classList.remove('flex');
+    }
+
+    function renderPreviousEntriesList() {
+      const sourceKey = document.getElementById('prev-source-date-select').value;
+      const sourceDiary = diaryCache.find(d => d.dateKey === sourceKey);
+      const container = document.getElementById('prev-entries-list');
+
+      if (!sourceDiary || !sourceDiary.inspections || sourceDiary.inspections.length === 0) {
+        container.innerHTML = `<div class="text-center py-6 text-xs text-slate-400">No inspection entries found on ${escapeHTML(sourceKey)}</div>`;
+        return;
+      }
+
+      container.innerHTML = sourceDiary.inspections.map((item, idx) => `
+        <label class="flex items-start gap-2.5 bg-white p-3 rounded-xl border border-slate-200 hover:border-amber-400 cursor-pointer transition">
+          <input type="checkbox" class="prev-entry-checkbox mt-0.5 w-4 h-4 accent-sky-600 rounded" value="${idx}" checked />
+          <div class="flex-1 min-w-0">
+            <div class="flex items-center gap-1.5">
+              <span class="text-[10px] font-extrabold uppercase px-1.5 py-0.5 rounded ${item.session === 'Morning' ? 'bg-amber-100 text-amber-800' : 'bg-sky-100 text-sky-800'}">
+                ${escapeHTML(item.session)}
+              </span>
+              <span class="text-xs sm:text-sm font-bold text-slate-900 truncate">${escapeHTML(item.title)}</span>
+            </div>
+            ${item.notes ? `<p class="text-[11px] text-slate-500 mt-1 truncate">${escapeHTML(item.notes)}</p>` : ''}
+          </div>
+        </label>
+      `).join('');
+    }
+
+    function toggleSelectAllPrevEntries(checked) {
+      document.querySelectorAll('.prev-entry-checkbox').forEach(cb => {
+        cb.checked = checked;
+      });
+    }
+
+    async function importSelectedPreviousEntries() {
+      const sourceKey = document.getElementById('prev-source-date-select').value;
+      const sourceDiary = diaryCache.find(d => d.dateKey === sourceKey);
+      if (!sourceDiary || !sourceDiary.inspections) return;
+
+      const includeNotes = document.getElementById('prev-include-notes').checked;
+      const selectedIndices = Array.from(document.querySelectorAll('.prev-entry-checkbox:checked'))
+        .map(cb => parseInt(cb.value, 10));
+
+      if (selectedIndices.length === 0) {
+        showToast('Select at least one entry to add', '⚠️');
+        return;
+      }
+
+      selectedIndices.forEach((idx, i) => {
+        const src = sourceDiary.inspections[idx];
+        if (!src) return;
+        const entryType = inferEntryType(src);
+        const inspectionCategory = inferInspectionCategory(src);
+        appState.inspections.push({
+          id: `insp-${Date.now()}-${i}-${Math.random().toString(36).slice(2, 5)}`,
+          session: src.session || 'Afternoon',
+          entryType,
+          inspectionCategory,
+          status: entryType === 'Random Check' ? 'OK' : 'Accepted with comments',
+          title: src.title,
+          notes: includeNotes ? (src.notes || '') : '',
+          aePresent: src.aePresent !== false,
+          foremanPresent: src.foremanPresent !== false,
+          attendeeNote: src.attendeeNote || '',
+          defects: [],
+          photos: []
+        });
+      });
+
+      await saveState(false);
+      renderInspections();
+      closePreviousEntriesModal();
+      showToast(`Added ${selectedIndices.length} previous entr${selectedIndices.length === 1 ? 'y' : 'ies'} to ${appState.dateKey}`);
+    }
+
+    var toastTimer = null;
+
+    function showToast(message, icon = '✔') {
+        const toast = document.getElementById('toast');
+        const toastMsg = document.getElementById('toast-msg');
+        const toastIcon = document.getElementById('toast-icon');
+
+        if (!toast || !toastMsg || !toastIcon) return;
+
+        if (toastTimer) {
+            clearTimeout(toastTimer);
+            toastTimer = null;
+        }
+
+        toastMsg.textContent = message;
+        toastIcon.textContent = icon;
+
+        toast.classList.remove('hidden');
+        toast.classList.add('flex');
+
+        toastTimer = setTimeout(() => {
+            toast.classList.add('hidden');
+            toast.classList.remove('flex');
+            toastTimer = null;
+        }, 3000);
+    }
+
+    function escapeHTML(str) {
+      if (!str) return '';
+      return String(str)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#39;');
+    }
+
+
+    window.runSiteDiarySelfTest = async function() {
+      const result = { startupState: false, defaultBuilder: false, databaseWriteRead: false, uiState: false };
+      result.startupState = !!(appState && appState.meta && Array.isArray(appState.inspections));
+      const probeDate = '31/12/2099';
+      const existing = await dbGetDiary(probeDate);
+      const probe = buildDefaultDiaryForDate(probeDate, { inspector: 'TEST', role: 'TEST' });
+      result.defaultBuilder = probe.dateKey === probeDate && probe.meta.inspector === 'TEST';
+      await dbPutDiary(probe);
+      const readBack = await dbGetDiary(probeDate);
+      result.databaseWriteRead = !!(readBack && readBack.dateKey === probeDate);
+      await dbDeleteDiary(probeDate);
+      if (existing) await dbPutDiary(existing);
+      result.uiState = !!document.getElementById('meta-date');
+      console.table(result);
+      return result;
+    };
+
+    window.onload = function() {
+      initAppStorage().catch(function(err) {
+        console.error('Application startup failed:', err);
+        showToast('Startup failed: ' + (err && err.message ? err.message : 'unknown error'), '⚠️');
+      });
+    };
+  </script>
+</body>
+</html>
