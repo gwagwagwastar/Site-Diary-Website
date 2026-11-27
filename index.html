@@ -179,7 +179,23 @@
 
       <!-- Horizontal Scrollable Saved Date Pills -->
       <div id="saved-days-pills" class="flex items-center gap-2 overflow-x-auto no-scrollbar pb-0.5"></div>
-      <p class="text-xs text-slate-500" role="status"><span id="offline-status">Offline reopening not enabled.</span> GitHub sync is not configured.</p>
+      <p class="text-xs text-slate-500" role="status"><span id="offline-status">Offline reopening not enabled.</span> <span id="vault-status">Private sync locked.</span></p>
+      <details id="vault-panel" class="text-sm space-y-2">
+        <summary class="font-bold cursor-pointer">Encrypted GitHub sync</summary>
+        <p>Use a separate private repository initialized with a README. Your token and passphrase stay in memory until you lock or reload. Browser storage and manual JSON backups remain unencrypted.</p>
+        <form id="vault-form" class="space-y-2" autocomplete="off">
+          <label class="block">Private repository (owner/name) <input id="vault-repo" class="w-full border rounded-lg p-2" required placeholder="owner/private-diary"></label>
+          <label class="block">Fine-grained token (Contents: read and write) <input id="vault-token" class="w-full border rounded-lg p-2" type="password" required autocomplete="off"></label>
+          <label class="block">Diary passphrase (at least 16 characters) <input id="vault-password" class="w-full border rounded-lg p-2" type="password" minlength="16" required autocomplete="off"></label>
+          <p>Use the same long, unique passphrase on every device. Keep a copy in your password manager; there is no password reset.</p>
+          <button id="vault-unlock" disabled class="bg-slate-900 text-white rounded-lg p-2">Unlock and sync</button>
+        </form>
+        <div id="vault-actions" hidden>
+          <button id="vault-now" class="border rounded-lg p-2">Sync now</button>
+          <button id="vault-lock" class="border rounded-lg p-2">Lock sync</button>
+          <button id="vault-resolve" hidden class="border rounded-lg p-2">Review conflicting dates</button>
+        </div>
+      </details>
     </section>
 
     <!-- Diary Header Metadata Card -->
@@ -940,7 +956,7 @@
     // 1. MULTI-DAY INDEXEDDB PHONE STORAGE ENGINE & HK WEATHER LOOKUP
     // =========================================================================
     const DB_NAME = 'QCS_Site_Diary_Phone_DB';
-    const DB_VERSION = 1;
+    const DB_VERSION = 2;
     const STORE_NAME = 'diaries';
     const ACTIVE_DATE_KEY = 'qcs_active_diary_date_v3';
     var toastTimer = null;
@@ -1073,6 +1089,7 @@
         const request = indexedDB.open(DB_NAME, DB_VERSION);
         request.onupgradeneeded = function(e) {
           const db = e.target.result;
+          if (!db.objectStoreNames.contains('syncBases')) db.createObjectStore('syncBases');
           if (!db.objectStoreNames.contains(STORE_NAME)) {
             db.createObjectStore(STORE_NAME, { keyPath: 'dateKey' });
           }
@@ -1106,6 +1123,7 @@
         console.warn('IndexedDB fallback to localStorage:', err);
         localStorage.setItem('qcs_fallback_' + diaryObj.dateKey, JSON.stringify(diaryObj));
       }
+      window.dispatchEvent(new Event('diary-saved'));
     }
 
     async function dbGetDiary(dateKey) {
@@ -1154,6 +1172,7 @@
       } catch (err) {
         localStorage.removeItem('qcs_fallback_' + norm);
       }
+      window.dispatchEvent(new Event('diary-saved'));
     }
 
     var appState = null;
@@ -2931,11 +2950,12 @@
     }
 
     window.onload = function() {
-      initAppStorage().catch(function(err) {
+      initAppStorage().then(() => { document.getElementById('vault-unlock').disabled = false; }).catch(function(err) {
         console.error('Application startup failed:', err);
         showToast('Startup failed: ' + (err && err.message ? err.message : 'unknown error'), '⚠️');
       });
     };
   </script>
+  <script src="./diary-sync.js"></script>
 </body>
 </html>
