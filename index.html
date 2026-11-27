@@ -4,13 +4,10 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
   <title>Site Diary & QCS Inspection Log</title>
-  <script src="https://cdn.tailwindcss.com"></script>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="./diary.css">
   <style>
     body {
-      font-family: 'Inter', sans-serif;
+      font-family: system-ui, sans-serif;
       background-color: #f1f5f9;
       color: #0f172a;
       -webkit-tap-highlight-color: transparent;
@@ -182,6 +179,7 @@
 
       <!-- Horizontal Scrollable Saved Date Pills -->
       <div id="saved-days-pills" class="flex items-center gap-2 overflow-x-auto no-scrollbar pb-0.5"></div>
+      <p class="text-xs text-slate-500" role="status"><span id="offline-status">Offline reopening not enabled.</span> GitHub sync is not configured.</p>
     </section>
 
     <!-- Diary Header Metadata Card -->
@@ -363,7 +361,7 @@
       <!-- Input + Instant Add / Add & Snap Buttons -->
       <div class="flex flex-col sm:flex-row gap-2">
         <input id="quick-title-input" type="text" onkeydown="if(event.key==='Enter') handleQuickAdd(false)"
-          placeholder="Type location / activity (e.g., BST205 B3 wall rebar)..."
+          placeholder="Type location / activity (e.g., basement wall rebar)..."
           class="flex-1 bg-slate-50 border border-slate-300 rounded-xl px-3.5 py-2.5 text-sm font-semibold text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-amber-500" />
         <div class="flex items-center gap-2 shrink-0">
           <button type="button" onclick="handleQuickAdd(false)"
@@ -382,7 +380,7 @@
     <!-- Filter / Search Bar -->
     <div class="flex items-center gap-2 no-print">
       <div class="relative flex-1">
-        <input id="search-input" type="text" oninput="renderInspections()" placeholder="Filter inspection items, codes (e.g. BST209, C149), or defects..."
+        <input id="search-input" type="text" oninput="renderInspections()" placeholder="Filter inspection items, location codes, or defects..."
           class="w-full bg-white border border-slate-200 rounded-xl pl-9 pr-3 py-2.5 text-sm text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-amber-500 shadow-sm" />
         <svg class="w-4 h-4 text-slate-400 absolute left-3 top-3" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
           <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
@@ -518,7 +516,7 @@
 
       <!-- Live Overlay Watermark Preview -->
       <div id="camera-live-overlay" class="absolute bottom-3 left-3 right-3 bg-slate-950/75 backdrop-blur-sm text-white px-3 py-2 rounded-xl border border-white/10 text-xs font-mono-code pointer-events-none">
-        <div class="text-amber-400 font-bold" id="overlay-inspector">Chan Wing Yiu (QCS) | 17/11/2026</div>
+        <div class="text-amber-400 font-bold" id="overlay-inspector">17/11/2026</div>
         <div class="text-slate-200 truncate" id="overlay-item-label">Inspection Item</div>
       </div>
 
@@ -602,7 +600,7 @@
 
         <div>
           <label class="block text-xs font-bold text-slate-600 uppercase mb-1">Defect Message Sent to Contractor</label>
-          <textarea id="defect-text-input" rows="4" placeholder="Paste or type defect message sent to contractor AE / Foreman (e.g., 'C149 Column Head: honeycombing observed at north face, please hack & patch with approved non-shrink grout before next pour')..."
+          <textarea id="defect-text-input" rows="4" placeholder="Paste or type the defect message sent to the contractor AE / Foreman..."
             class="w-full bg-slate-50 border border-slate-200 rounded-xl p-3 text-sm text-slate-900 focus:outline-none focus:ring-2 focus:ring-rose-500"></textarea>
         </div>
 
@@ -706,7 +704,7 @@
             <button type="button" onclick="fillModalChip('Cube test ', 'Inspection', 'Cube Test')" class="shrink-0 text-[11px] font-semibold bg-slate-100 hover:bg-amber-100 text-slate-700 px-2 py-1 rounded-lg border border-slate-200">Cube test</button>
             <button type="button" onclick="fillModalChip('Reinspected ', 'Inspection', 'General')" class="shrink-0 text-[11px] font-semibold bg-slate-100 hover:bg-amber-100 text-slate-700 px-2 py-1 rounded-lg border border-slate-200">Reinspection</button>
           </div>
-          <input id="item-title-input" type="text" placeholder="e.g., BST205 B3 wall rebar or Random check concreting"
+          <input id="item-title-input" type="text" placeholder="e.g., basement wall rebar or random check concreting"
             class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2.5 text-sm font-semibold text-slate-900 focus:outline-none focus:ring-2 focus:ring-amber-500" />
         </div>
 
@@ -1048,40 +1046,12 @@
       const normDate = normalizeDateKey(dateStr);
       const hkW = lookupHKWeather(normDate);
 
-      if (normDate === '17/11/2026') {
-        return {
-          dateKey: '17/11/2026',
-          updatedAt: Date.now(),
-          meta: {
-            inspector: 'Chan Wing Yiu',
-            role: 'QCS',
-            date: '17/11/2026',
-            weather: hkW.weather,
-            temp: hkW.temp,
-            generalNotes: hkW.note
-          },
-          inspections: [
-            { id: 'insp-1', session: 'Morning', entryType: 'Inspection', inspectionCategory: 'Cube Test', status: 'Accepted with comments', title: 'August Cube Test report checking', notes: '', aePresent: true, foremanPresent: true, attendeeNote: '', defects: [], photos: [] },
-            { id: 'insp-2', session: 'Afternoon', entryType: 'Inspection', inspectionCategory: 'General', status: 'Accepted with comments', title: 'BST209 B4M-B3', notes: '', aePresent: true, foremanPresent: true, attendeeNote: '', defects: [], photos: [] },
-            { id: 'insp-3', session: 'Afternoon', entryType: 'Inspection', inspectionCategory: 'General', status: 'Accepted with comments', title: 'BST210 B4-B4M', notes: '', aePresent: true, foremanPresent: true, attendeeNote: '', defects: [], photos: [] },
-            { id: 'insp-4', session: 'Afternoon', entryType: 'Inspection', inspectionCategory: 'General', status: 'Accepted with comments', title: 'BST223 B4M HL to B3', notes: '', aePresent: true, foremanPresent: true, attendeeNote: '', defects: [], photos: [] },
-            { id: 'insp-5', session: 'Afternoon', entryType: 'Inspection', inspectionCategory: 'General', status: 'Accepted with comments', title: 'C12J B4M-B3', notes: '', aePresent: true, foremanPresent: true, attendeeNote: '', defects: [], photos: [] },
-            { id: 'insp-6', session: 'Afternoon', entryType: 'Inspection', inspectionCategory: 'General', status: 'Accepted with comments', title: 'C149 Column Head reinspected', notes: '', aePresent: true, foremanPresent: true, attendeeNote: '', defects: [], photos: [] },
-            { id: 'insp-7', session: 'Afternoon', entryType: 'Random Check', inspectionCategory: 'Concreting', status: 'OK', title: 'Random check concreting', notes: '', aePresent: true, foremanPresent: true, attendeeNote: '', defects: [], photos: [] },
-            { id: 'insp-8', session: 'Afternoon', entryType: 'Random Check', inspectionCategory: 'Steelwork', status: 'OK', title: 'Random check steelwork stiffener', notes: '', aePresent: true, foremanPresent: true, attendeeNote: '', defects: [], photos: [] },
-            { id: 'insp-9', session: 'Afternoon', entryType: 'Random Check', inspectionCategory: 'Rebar Fixing', status: 'OK', title: 'Random check zone 18 btm rebar', notes: '', aePresent: true, foremanPresent: true, attendeeNote: '', defects: [], photos: [] },
-            { id: 'insp-10', session: 'Afternoon', entryType: 'Inspection', inspectionCategory: 'General', status: 'Accepted with comments', title: 'BST203 B3M landing', notes: '', aePresent: true, foremanPresent: true, attendeeNote: '', defects: [], photos: [] },
-            { id: 'insp-11', session: 'Afternoon', entryType: 'Random Check', inspectionCategory: 'Concreting', status: 'OK', title: 'Random check slump', notes: '', aePresent: true, foremanPresent: true, attendeeNote: '', defects: [], photos: [] }
-          ]
-        };
-      }
-
       return {
         dateKey: normDate,
         updatedAt: Date.now(),
         meta: {
-          inspector: (previousMeta && previousMeta.inspector) || 'Chan Wing Yiu',
-          role: (previousMeta && previousMeta.role) || 'QCS',
+          inspector: (previousMeta && previousMeta.inspector) || '',
+          role: (previousMeta && previousMeta.role) || '',
           date: normDate,
           weather: hkW.weather,
           temp: hkW.temp,
@@ -1433,8 +1403,8 @@
         const t = getTodayDateKey().split('/');
         todayBtn.textContent = `+ Today (${t[0]}/${t[1]})`;
       }
-      document.getElementById('meta-inspector').value = appState.meta.inspector || 'Chan Wing Yiu';
-      document.getElementById('meta-role').value = appState.meta.role || 'QCS';
+      document.getElementById('meta-inspector').value = appState.meta.inspector || '';
+      document.getElementById('meta-role').value = appState.meta.role || '';
       document.getElementById('meta-date').value = appState.meta.date || '17/11/2026';
       document.getElementById('meta-weather').value = appState.meta.weather || 'Mainly cloudy with sunny periods';
       document.getElementById('meta-temp').value = appState.meta.temp || '23-27°C';
@@ -2120,7 +2090,7 @@
       const report = document.getElementById('a4-print-report');
       if (!report) return;
       const esc = escapeHTML;
-      const projectName = (appState.meta && appState.meta.project) || 'New Central Harbourfront Site 3';
+      const projectName = (appState.meta && appState.meta.project) || '';
 
       const getTimes = item => {
         if (item.startTime || item.endTime) return item.startTime && item.endTime ? `${item.startTime}-${item.endTime}` : (item.startTime || item.endTime);
@@ -2401,8 +2371,8 @@
           if (!candidateDate) continue;
           d.dateKey = normalizeDateKey(candidateDate);
           d.meta.date = d.dateKey;
-          d.meta.inspector = d.meta.inspector || 'Chan Wing Yiu';
-          d.meta.role = d.meta.role || 'QCS';
+          d.meta.inspector = d.meta.inspector || '';
+          d.meta.role = d.meta.role || '';
           d.meta.weather = d.meta.weather || '';
           d.meta.temp = d.meta.temp || '';
           d.meta.generalNotes = d.meta.generalNotes || '';
@@ -2942,6 +2912,23 @@
       console.table(result);
       return result;
     };
+
+    if ('serviceWorker' in navigator && /^https?:$/.test(location.protocol)) {
+      const status = document.getElementById('offline-status');
+      status.textContent = 'Preparing offline access...';
+      navigator.serviceWorker.register('./sw.js').then(registration => {
+        function updateStatus() {
+          if (registration.active) status.textContent = 'Ready to reopen offline.';
+          else if (!registration.installing && !registration.waiting) status.textContent = 'Offline setup failed. Reload online to retry.';
+        }
+        registration.installing?.addEventListener('statechange', updateStatus);
+        updateStatus();
+        navigator.serviceWorker.ready.then(() => { status.textContent = 'Ready to reopen offline.'; });
+      }).catch(error => {
+        console.error('Diary offline setup failed:', error);
+        status.textContent = 'Offline setup failed. Reload online to retry.';
+      });
+    }
 
     window.onload = function() {
       initAppStorage().catch(function(err) {
