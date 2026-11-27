@@ -205,7 +205,7 @@
   el('form').onsubmit = async event => {
     event.preventDefault();
     const repo = el('repo').value.trim().toLowerCase();
-    if (!/^[a-z0-9-]+\/[a-z0-9_.-]+$/.test(repo) || ['.', '..'].includes(repo.split('/')[1])) {
+    if (!/^[a-z0-9_-]+\/[a-z0-9_.-]+$/.test(repo) || ['.', '..'].includes(repo.split('/')[1])) {
       text('Enter a repository as owner/name, not a URL.'); return;
     }
     if (!window.isSecureContext || !crypto.subtle) { text('Encryption requires HTTPS or localhost.'); return; }

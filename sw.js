@@ -1,6 +1,6 @@
 // Bump the version when publishing changes to the HTML or CSS.
 const prefix = `site-diary:${self.registration.scope}:`;
-const cacheName = `${prefix}v2`;
+const cacheName = `${prefix}v3`;
 const app = new URL('index.html', self.registration.scope).href;
 const css = new URL('diary.css', self.registration.scope).href;
 const sync = new URL('diary-sync.js', self.registration.scope).href;
